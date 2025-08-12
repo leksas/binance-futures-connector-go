@@ -3,6 +3,7 @@ package binance_futures_connector
 type (
 	Side           = string
 	PositionSide   = string
+	MarginType     = string
 	OrderType      = string
 	TimeInForce    = string
 	WorkingType    = string
@@ -26,6 +27,12 @@ var (
 	Both  PositionSide = "BOTH"  // 单一持仓方向
 	Long  PositionSide = "LONG"  // 多头(双向持仓下)
 	Short PositionSide = "SHORT" // 空头(双向持仓下)
+
+	Isolated MarginType = "ISOLATED" // 逐仓
+	Crossed  MarginType = "CROSSED"  // 全仓
+
+	PositionMarginAdd = 1 // 增加逐仓保证金
+	PositionMarginSub = 2 // 减少逐仓保证金
 
 	// OrderType 订单种类
 	Limit              OrderType = "LIMIT"                // 限价单

@@ -927,32 +927,25 @@ type UserTradeResponse struct {
 	Time            int64  `json:"time"`            // 时间
 }
 
-type MarginType string
-
-const (
-	MarginTypeIsolated MarginType = "ISOLATED"
-	MarginTypeCrossed  MarginType = "CROSSED"
-)
-
-// SetMarginType 变换逐全仓模式 (POST /fapi/v1/marginType)
+// SetMarginTypeService 变换逐全仓模式 (POST /fapi/v1/marginType)
 // 请求权重 1
-type SetMarginType struct {
+type SetMarginTypeService struct {
 	c          *Client
 	symbol     string
-	marginType string // 保证金模式 ISOLATED(逐仓), CROSSED(全仓)
+	marginType MarginType // 保证金模式 ISOLATED(逐仓), CROSSED(全仓)
 }
 
-func (s *SetMarginType) Symbol(symbol string) *SetMarginType {
+func (s *SetMarginTypeService) Symbol(symbol string) *SetMarginTypeService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *SetMarginType) MarginType(marginType string) *SetMarginType {
+func (s *SetMarginTypeService) MarginType(marginType MarginType) *SetMarginTypeService {
 	s.marginType = marginType
 	return s
 }
 
-func (s *SetMarginType) Do(ctx context.Context, opts ...RequestOption) (res *Response, err error) {
+func (s *SetMarginTypeService) Do(ctx context.Context, opts ...RequestOption) (res *Response, err error) {
 	r := &request{
 		method:   http.MethodPost,
 		endpoint: "/fapi/v1/marginType",
@@ -976,7 +969,7 @@ func (s *SetMarginType) Do(ctx context.Context, opts ...RequestOption) (res *Res
 }
 
 type Response struct {
-	Code string `json:"code"`
+	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 }
 
@@ -1094,7 +1087,7 @@ func (s *SetMultiAssetMarginService) Do(ctx context.Context, opts ...RequestOpti
 // 针对逐仓模式下的仓位，调整其逐仓保证金资金
 // 只针对逐仓symbol 与 positionSide(如有)
 // 请求权重 1
-type PositionMargin struct {
+type PositionMarginService struct {
 	c            *Client
 	symbol       string
 	positionSide *string
@@ -1102,27 +1095,27 @@ type PositionMargin struct {
 	typ          int // 调整方向 1: 增加逐仓保证金，2: 减少逐仓保证金
 }
 
-func (s *PositionMargin) Symbol(symbol string) *PositionMargin {
+func (s *PositionMarginService) Symbol(symbol string) *PositionMarginService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *PositionMargin) PositionSide(positionSide string) *PositionMargin {
+func (s *PositionMarginService) PositionSide(positionSide string) *PositionMarginService {
 	s.positionSide = &positionSide
 	return s
 }
 
-func (s *PositionMargin) Amount(amount float64) *PositionMargin {
+func (s *PositionMarginService) Amount(amount float64) *PositionMarginService {
 	s.amount = amount
 	return s
 }
 
-func (s *PositionMargin) Type(typ int) *PositionMargin {
+func (s *PositionMarginService) Type(typ int) *PositionMarginService {
 	s.typ = typ
 	return s
 }
 
-func (s *PositionMargin) Do(ctx context.Context, opts ...RequestOption) (res *Response, err error) {
+func (s *PositionMarginService) Do(ctx context.Context, opts ...RequestOption) (res *Response, err error) {
 	r := &request{
 		method:   http.MethodPost,
 		endpoint: "/fapi/v1/positionMargin",

@@ -181,9 +181,11 @@ func (s *SymbolConfigService) Do(ctx context.Context, opts ...RequestOption) (re
 	r := &request{
 		method:   http.MethodGet,
 		endpoint: "/fapi/v1/symbolConfig",
-		secType:  secTypeNone,
+		secType:  secTypeSigned,
 	}
-	r.setParam("symbol", s.symbol)
+	if s.symbol != nil {
+		r.setParam("symbol", s.symbol)
+	}
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return []SymbolConfig{}, err
@@ -195,7 +197,7 @@ func (s *SymbolConfigService) Do(ctx context.Context, opts ...RequestOption) (re
 type SymbolConfig struct {
 	Symbol           string `json:"symbol"`
 	MarginType       string `json:"marginType"`
-	IsAutoAddMargin  string `json:"isAutoAddMargin"`
+	IsAutoAddMargin  bool   `json:"isAutoAddMargin"`
 	Leverage         int    `json:"leverage"`
 	MaxNotionalValue string `json:"maxNotionalValue"`
 }

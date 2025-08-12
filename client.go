@@ -534,6 +534,12 @@ func (c *Client) NewGetAccountConfigService() *AccountConfigService {
 	return &AccountConfigService{c: c}
 }
 
+// Binance Get Symbol Config (GET /fapi/v1/exchangeInfo)
+// 交易对配置
+func (c *Client) NewGetSymbolConfigService() *SymbolConfigService {
+	return &SymbolConfigService{c: c}
+}
+
 // ---------------------------Trade API---------------------------------
 
 // Binance Create Order (POST /fapi/v1/order)
@@ -552,6 +558,18 @@ func (c *Client) NewCancelOpenOrdersService() *CancelAllOpenOrdersService {
 // 查看当前全部挂单
 func (c *Client) NewGetOpenOrdersService() *GetOpenOrdersService {
 	return &GetOpenOrdersService{c: c}
+}
+
+// Binance Set Margin Type (POST /fapi/v1/marginType)
+// 变换逐全仓模式
+func (c *Client) NewSetMarginTypeService() *SetMarginTypeService {
+	return &SetMarginTypeService{c: c}
+}
+
+// Binance Set Position Margin (POST /fapi/v1/positionMargin)
+// 调整逐仓保证金
+func (c *Client) NewSetPositionMarginService() *PositionMarginService {
+	return &PositionMarginService{c: c}
 }
 
 // Binance Set Position Side Dual (POST /fapi/v1/positionSide/dual)
