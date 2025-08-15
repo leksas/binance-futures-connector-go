@@ -209,9 +209,6 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 	}
 
 	id := getUUID()
-	if s.newClientOrderId != nil {
-		id = *s.newClientOrderId
-	}
 
 	payload := map[string]interface{}{
 		"id":     id,
@@ -363,9 +360,6 @@ func (s *OrderModifyService) Do(ctx context.Context) (*OrderPlacementResponse, e
 	}
 
 	id := getUUID()
-	if s.origClientOrderId != nil {
-		id = *s.origClientOrderId
-	}
 
 	payload := map[string]interface{}{
 		"id":     id,
@@ -444,9 +438,6 @@ func (s *OrderCancelService) Do(ctx context.Context) (response *OrderPlacementRe
 	}
 
 	id := getUUID()
-	if s.origClientOrderId != nil {
-		id = *s.origClientOrderId
-	}
 
 	payload := map[string]interface{}{
 		"id":     id,
@@ -497,9 +488,6 @@ func (s *OrderCancelService) Send() {
 	}
 
 	id := getUUID()
-	if s.origClientOrderId != nil {
-		id = *s.origClientOrderId
-	}
 
 	payload := map[string]interface{}{
 		"id":     id,
@@ -558,9 +546,6 @@ func (s *OrderStatusService) Do(ctx context.Context, opts ...RequestOption) (res
 	}
 
 	id := getUUID()
-	if s.origClientOrderId != nil {
-		id = *s.origClientOrderId
-	}
 
 	payload := map[string]interface{}{
 		"id":     id,

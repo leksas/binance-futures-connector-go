@@ -209,7 +209,7 @@ func (c *WebsocketStreamClient) WsCombinedBookTickerServe(symbols []string, hand
 		endpoint += fmt.Sprintf("%s@bookTicker", strings.ToLower(s)) + "/"
 	}
 	endpoint = endpoint[:len(endpoint)-1]
-	cfg := newWsConfig(endpoint)
+	cfg := newWsConfig(endpoint, c.BindIP)
 	wsHandler := func(message []byte) {
 		event := new(WsCombinedBookTickerEvent)
 		err = Unmarshal(message, event)
@@ -221,6 +221,11 @@ func (c *WebsocketStreamClient) WsCombinedBookTickerServe(symbols []string, hand
 		handler(event.Data)
 	}
 	return wsServe(cfg, wsHandler, errHandler)
+}
+
+type WsCombinedKlineEvent struct {
+	Data   *WsKlineEvent `json:"data"`
+	Stream string        `json:"stream"`
 }
 
 // WsKlineHandler handle websocket kline event
@@ -235,28 +240,15 @@ func (c *WebsocketStreamClient) WsCombinedKlineServe(symbolIntervalPair map[stri
 	endpoint = endpoint[:len(endpoint)-1]
 	cfg := newWsConfig(endpoint)
 
-	var parser fastjson.Parser
 	wsHandler := func(message []byte) {
-		j, err := parser.ParseBytes(message)
+		event := new(WsCombinedKlineEvent)
+		err = Unmarshal(message, event)
 		if err != nil {
 			errHandler(err)
 			return
 		}
 
-		stream := string(j.GetStringBytes("stream"))
-		data := j.Get("data").MarshalTo(nil)
-
-		symbol := strings.Split(stream, "@")[0]
-
-		event := new(WsKlineEvent)
-		err = Unmarshal(data, event)
-		if err != nil {
-			errHandler(err)
-			return
-		}
-		event.Symbol = strings.ToUpper(symbol)
-
-		handler(event)
+		handler(event.Data)
 	}
 	return wsServe(cfg, wsHandler, errHandler)
 }
@@ -370,7 +362,7 @@ type WsUserDataHandler func(event *WsUserDataEvent)
 // WsUserDataServe serve user data handler with listen key
 func (c *WebsocketStreamClient) WsUserDataServe(listenKey string, handler WsUserDataHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
 	endpoint := fmt.Sprintf("%s/%s", c.Endpoint, listenKey)
-	cfg := newWsConfig(endpoint)
+	cfg := newWsConfig(endpoint, c.BindIP)
 	wsHandler := func(message []byte) {
 		recvTime := time.Now()
 		j, err := newJSONV2(message)

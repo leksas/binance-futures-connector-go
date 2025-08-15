@@ -2,6 +2,7 @@ package binance_futures_connector
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -17,11 +18,13 @@ type ErrHandler func(err error)
 // WsConfig webservice configuration
 type WsConfig struct {
 	Endpoint string
+	BindIP   string
 }
 
 type WebsocketStreamClient struct {
 	Endpoint   string
 	IsCombined bool
+	BindIP     string
 }
 
 func NewWebsocketStreamClient(isCombined bool, baseURL ...string) *WebsocketStreamClient {
@@ -45,9 +48,18 @@ func NewWebsocketStreamClient(isCombined bool, baseURL ...string) *WebsocketStre
 	}
 }
 
-func newWsConfig(endpoint string) *WsConfig {
+func (c *WebsocketStreamClient) SetBindIP(ip string) {
+	c.BindIP = ip
+}
+
+func newWsConfig(endpoint string, bindIP ...string) *WsConfig {
+	var ip string
+	if len(bindIP) > 0 {
+		ip = bindIP[0]
+	}
 	return &WsConfig{
 		Endpoint: endpoint,
+		BindIP:   ip,
 	}
 }
 
@@ -57,6 +69,20 @@ var wsServe = func(cfg *WsConfig, handler WsHandler, errHandler ErrHandler) (don
 		HandshakeTimeout:  45 * time.Second,
 		EnableCompression: false,
 	}
+
+	if cfg.BindIP != "" {
+		Dialer.NetDial = func(network, addr string) (net.Conn, error) {
+			lAddr, err := net.ResolveTCPAddr(network, cfg.BindIP+":0")
+			if err != nil {
+				return nil, err
+			}
+			dialer := net.Dialer{
+				LocalAddr: lAddr,
+			}
+			return dialer.Dial(network, addr)
+		}
+	}
+
 	headers := http.Header{}
 	headers.Add("User-Agent", fmt.Sprintf("%s/%s", Name, Version))
 	c, _, err := Dialer.Dial(cfg.Endpoint, headers)

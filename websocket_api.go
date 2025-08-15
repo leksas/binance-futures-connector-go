@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -35,7 +36,8 @@ type WebsocketAPIClient struct {
 	Conn              *websocket.Conn
 	Dialer            *websocket.Dialer
 	ReqResponseMap    sync.Map
-	mu                sync.Mutex
+	Mu                sync.Mutex
+	BindIP            string
 }
 
 type WsAPIRateLimit struct {
@@ -101,6 +103,20 @@ func (c *WebsocketAPIClient) UseSBEStreams() {
 	// 安全地追加SBE参数
 	c.Endpoint = fmt.Sprintf("%s%sresponseFormat=sbe&sbeSchemaId=2&sbeSchemaVersion=1",
 		c.Endpoint, separator)
+}
+
+func (c *WebsocketAPIClient) SetBindIP(ip string) {
+	c.Endpoint = "wss://ws-fapi-mm.binance.com/ws-fapi/v1"
+	c.Dialer.NetDial = func(network, addr string) (net.Conn, error) {
+		lAddr, err := net.ResolveTCPAddr(network, ip+":0")
+		if err != nil {
+			return nil, err
+		}
+		dialer := net.Dialer{
+			LocalAddr: lAddr,
+		}
+		return dialer.Dial(network, addr)
+	}
 }
 
 func (c *WebsocketAPIClient) Connect() error {
@@ -176,8 +192,8 @@ func (c *WebsocketAPIClient) Close() error {
 }
 
 func (c *WebsocketAPIClient) SendMessage(msg interface{}) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Mu.Lock()
+	defer c.Mu.Unlock()
 
 	return c.Conn.WriteJSON(msg)
 }
