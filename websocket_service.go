@@ -447,7 +447,7 @@ func parseOrderTrade(data *fastjson.Value) WsOrder {
 			SI:             data.GetInt("si"),
 			SS:             data.GetInt("ss"),
 			RealizedProfit: string(data.GetStringBytes("rp")),
-			STPMpde:        STPMode(data.GetStringBytes("V")),
+			StpMode:        STPMode(data.GetStringBytes("V")),
 			PriceMatch:     string(data.GetStringBytes("pm")),
 			GoodTillDate:   data.GetInt64("gtd"),
 		}
@@ -465,7 +465,7 @@ func parseOrderTrade(data *fastjson.Value) WsOrder {
 			Status:        OrderStatus(data.GetStringBytes("X")),
 			StopPrice:     string(data.GetStringBytes("sp")),
 			TradeTime:     int64(data.GetInt64("T")),
-			STPMpde:       STPMode(data.GetStringBytes("V")),
+			StpMode:       STPMode(data.GetStringBytes("V")),
 		}
 	}
 }
@@ -593,7 +593,7 @@ type (
 		SI             int          `json:"si"`  // 忽略
 		SS             int          `json:"ss"`  // 忽略
 		RealizedProfit string       `json:"rp"`  // 该交易实现盈亏
-		STPMpde        STPMode      `json:"V"`   // 自成交防止模式
+		StpMode        STPMode      `json:"V"`   // 自成交防止模式
 		PriceMatch     string       `json:"pm"`  // 价格匹配模式
 		GoodTillDate   int64        `json:"gtd"` // TIF为GTD的订单自动取消时间
 	}

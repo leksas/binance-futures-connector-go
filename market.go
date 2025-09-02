@@ -472,7 +472,7 @@ func parseKlinesResponse(data []byte) (res []*KlinesResponse, err error) {
 		open := kline[1].(string)
 		high := kline[2].(string)
 		low := kline[3].(string)
-		close := kline[4].(string)
+		clos := kline[4].(string)
 		volume := kline[5].(string)
 		closeTime := kline[6].(float64)
 		quoteAssetVolume := kline[7].(string)
@@ -486,7 +486,7 @@ func parseKlinesResponse(data []byte) (res []*KlinesResponse, err error) {
 			Open:                     open,
 			High:                     high,
 			Low:                      low,
-			Close:                    close,
+			Close:                    clos,
 			Volume:                   volume,
 			CloseTime:                uint64(closeTime),
 			QuoteAssetVolume:         quoteAssetVolume,

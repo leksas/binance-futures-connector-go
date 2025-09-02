@@ -38,6 +38,10 @@ type WebsocketAPIClient struct {
 	ReqResponseMap    sync.Map
 	Mu                sync.Mutex
 	BindIP            string
+
+	stopChan       chan struct{}
+	maxBackoff     time.Duration // 最大退避间隔
+	initialBackoff time.Duration // 初始退避间隔
 }
 
 type WsAPIRateLimit struct {
@@ -78,6 +82,8 @@ func NewWebsocketAPIClient(apiKey string, apiSecret string, baseURL ...string) *
 			HandshakeTimeout:  45 * time.Second,
 			EnableCompression: false,
 		},
+		initialBackoff: 1 * time.Second,  // 初始重试间隔
+		maxBackoff:     30 * time.Second, // 最大重试间隔，避免间隔过大
 	}
 }
 
@@ -106,6 +112,10 @@ func (c *WebsocketAPIClient) UseSBEStreams() {
 }
 
 func (c *WebsocketAPIClient) SetBindIP(ip string) {
+	if ip == "" {
+		return
+	}
+
 	c.Endpoint = "wss://ws-fapi-mm.binance.com/ws-fapi/v1"
 	c.Dialer.NetDial = func(network, addr string) (net.Conn, error) {
 		lAddr, err := net.ResolveTCPAddr(network, ip+":0")
@@ -123,6 +133,12 @@ func (c *WebsocketAPIClient) Connect() error {
 	if c.Dialer == nil {
 		return fmt.Errorf("dialer not initialized")
 	}
+
+	// 初始化关闭信号通道
+	if c.stopChan == nil {
+		c.stopChan = make(chan struct{})
+	}
+
 	headers := http.Header{}
 	headers.Add("User-Agent", fmt.Sprintf("%s/%s", Name, Version))
 	conn, _, err := c.Dialer.Dial(c.Endpoint, headers)
@@ -141,14 +157,59 @@ func (c *WebsocketAPIClient) Connect() error {
 func (c *WebsocketAPIClient) startReader() {
 	go func() {
 		for {
-			_, message, err := c.Conn.ReadMessage()
-			if err != nil {
-				log.Println("Error reading:", err)
+			select {
+			case <-c.stopChan:
+				// 收到关闭信号，退出循环
+				log.Println("Stopping reader...")
 				return
+			default:
+				_, message, err := c.Conn.ReadMessage()
+				if err != nil {
+					log.Printf("Error reading: %v, attempting to reconnect...", err)
+					// 发生错误时关闭当前连接
+					if c.Conn != nil {
+						_ = c.Conn.Close()
+					}
+					// 尝试重新连接
+					c.reconnect()
+					return
+				}
+				// 处理消息
+				c.Handler(message)
 			}
-			c.Handler(message)
 		}
 	}()
+}
+
+// 重连逻辑，包含指数退避策略
+func (c *WebsocketAPIClient) reconnect() {
+	backoff := c.initialBackoff // 从初始间隔开始
+
+	for {
+		select {
+		case <-c.stopChan:
+			log.Println("Reconnect canceled")
+			return
+		default:
+			log.Printf("Attempting to reconnect (next delay: %v)...", backoff)
+			err := c.Connect()
+			if err == nil {
+				log.Println("Reconnected successfully")
+				return // 重连成功，退出重连循环
+			}
+
+			log.Printf("Reconnection failed: %v, waiting %v before next attempt", err, backoff)
+			time.Sleep(backoff)
+
+			// 退避间隔递增，但不超过最大限制
+			if backoff < c.maxBackoff {
+				backoff *= 2
+				if backoff > c.maxBackoff {
+					backoff = c.maxBackoff
+				}
+			}
+		}
+	}
 }
 
 // Handler function to handle responses
@@ -188,6 +249,9 @@ func (c *WebsocketAPIClient) WaitForCloseSignal() {
 }
 
 func (c *WebsocketAPIClient) Close() error {
+	if c.stopChan != nil {
+		close(c.stopChan)
+	}
 	return c.Conn.Close()
 }
 
@@ -216,7 +280,7 @@ func wsApiServe(c *websocket.Conn, handler WsHandler, errHandler ErrHandler) (st
 		if WebsocketAPIKeepalive {
 			keepAlive(c, WebsocketAPITimeout)
 		}
-		silent := false
+
 		for {
 			select {
 			case <-stopCh:
@@ -224,10 +288,8 @@ func wsApiServe(c *websocket.Conn, handler WsHandler, errHandler ErrHandler) (st
 			default:
 				_, message, err := c.ReadMessage()
 				if err != nil {
-					if !silent {
-						fmt.Println(err)
-						errHandler(err)
-					}
+					fmt.Println(err)
+					errHandler(err)
 					continue
 				}
 				handler(message)

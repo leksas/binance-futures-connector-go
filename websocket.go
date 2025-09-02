@@ -72,9 +72,9 @@ var wsServe = func(cfg *WsConfig, handler WsHandler, errHandler ErrHandler) (don
 
 	if cfg.BindIP != "" {
 		Dialer.NetDial = func(network, addr string) (net.Conn, error) {
-			lAddr, err2 := net.ResolveTCPAddr(network, cfg.BindIP+":0")
-			if err2 != nil {
-				return nil, err2
+			lAddr, err := net.ResolveTCPAddr(network, cfg.BindIP+":0")
+			if err != nil {
+				return nil, err
 			}
 			dialer := net.Dialer{
 				LocalAddr: lAddr,
@@ -98,7 +98,7 @@ var wsServe = func(cfg *WsConfig, handler WsHandler, errHandler ErrHandler) (don
 		// closed by the client.
 		defer func() {
 			close(doneCh)
-			c.Close()
+			_ = c.Close()
 		}()
 
 		if WebsocketKeepalive {

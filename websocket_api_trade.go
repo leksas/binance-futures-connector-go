@@ -24,7 +24,7 @@ type OrderPlacementService struct {
 	priceProtect     *bool
 	newOrderRespType *string
 	priceMatch       *PriceMatch
-	stpMpde          *STPMode
+	stpMode          *STPMode
 	goodTillDate     *int64
 	recvWindow       *int64
 }
@@ -130,7 +130,7 @@ func (s *OrderPlacementService) PriceMatch(priceMatch PriceMatch) *OrderPlacemen
 }
 
 func (s *OrderPlacementService) StpMode(stpMode STPMode) *OrderPlacementService {
-	s.stpMpde = &stpMode
+	s.stpMode = &stpMode
 	return s
 }
 
@@ -146,10 +146,16 @@ func (s *OrderPlacementService) RecvWindow(recvWindow int64) *OrderPlacementServ
 }
 
 func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse, error) {
+	respType := ACK
 	parameters := map[string]string{
 		"symbol": s.symbol,
 		"side":   s.side,
 		"type":   s.orderType,
+	}
+	switch {
+	case s.orderType == Market,
+		s.timeInForce != nil && (*s.timeInForce == IOC || *s.timeInForce == FOK):
+		respType = RESULT
 	}
 	if s.positionSide != nil {
 		parameters["positionSide"] = *s.positionSide
@@ -189,12 +195,14 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 	}
 	if s.newOrderRespType != nil {
 		parameters["newOrderRespType"] = *s.newOrderRespType
+	} else {
+		parameters["newOrderRespType"] = respType
 	}
 	if s.priceMatch != nil {
 		parameters["priceMatch"] = *s.priceMatch
 	}
-	if s.stpMpde != nil {
-		parameters["stp"] = *s.stpMpde
+	if s.stpMode != nil {
+		parameters["stp"] = *s.stpMode
 	}
 	if s.goodTillDate != nil {
 		parameters["goodTillDate"] = Int64ToString(*s.goodTillDate)
