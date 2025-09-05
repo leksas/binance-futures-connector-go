@@ -358,7 +358,7 @@ type ListStatusEvent struct {
 var ParseUserDataJsonRsp = parseUserDataJsonRsp
 
 func parseUserDataJsonRsp(message []byte) (*UserDataEvent, error) {
-	j, err := newJSONV2(message)
+	j, err := newJSONv2(message)
 	if err != nil {
 		return nil, err
 	}

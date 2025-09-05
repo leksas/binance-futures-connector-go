@@ -77,7 +77,7 @@ func (c *WebsocketStreamClient) WsPartialDepthServe100Ms(symbol string, levels s
 func wsPartialDepthServe(endpoint string, symbol string, handler WsPartialDepthHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
 	cfg := newWsConfig(endpoint)
 	wsHandler := func(message []byte) {
-		j, err := newJSONV2(message)
+		j, err := newJSONv2(message)
 		if err != nil {
 			errHandler(err)
 			return
@@ -122,7 +122,7 @@ func (c *WebsocketStreamClient) WsCombinedPartialDepthServe(symbolLevels map[str
 	cfg := newWsConfig(endpoint)
 	wsHandler := func(message []byte) {
 		fmt.Println(string(message))
-		j, err := newJSONV2(message)
+		j, err := newJSONv2(message)
 		if err != nil {
 			errHandler(err)
 			return
@@ -170,7 +170,7 @@ type WsBookTickerEvent struct {
 	Event           string `json:"e"`
 	UpdateID        int64  `json:"u"`
 	EventTime       int64  `json:"E"`
-	TranscationTime int64  `json:"T"`
+	TransactionTime int64  `json:"T"`
 	Symbol          string `json:"s"`
 	BestBidPrice    string `json:"b"`
 	BestBidQty      string `json:"B"`
@@ -335,7 +335,7 @@ type WsAggTradeEvent struct {
 	IsBuyerMaker          bool   `json:"m"`
 }
 
-// WsCombinedAggTradeServe is similar to WsAggTradeServe, but it handles multiple symbolx
+// WsCombinedAggTradeServe is similar to WsAggTradeServe, but it handles multiple symbol
 func (c *WebsocketStreamClient) WsCombinedAggTradeServe(symbols []string, handler WsAggTradeHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
 	endpoint := c.Endpoint
 	for s := range symbols {
@@ -365,7 +365,7 @@ func (c *WebsocketStreamClient) WsUserDataServe(listenKey string, handler WsUser
 	cfg := newWsConfig(endpoint, c.BindIP)
 	wsHandler := func(message []byte) {
 		recvTime := time.Now()
-		j, err := newJSONV2(message)
+		j, err := newJSONv2(message)
 		if err != nil {
 			errHandler(err)
 			return
@@ -602,7 +602,7 @@ type (
 	WsTradeLiteEvent struct {
 		Event           UserDataEventType `json:"e"` // 事件类型
 		EventTime       int64             `json:"E"` // 事件时间
-		TranscationTime int64             `json:"T"` // 交易时间
+		TransactionTime int64             `json:"T"` // 交易时间
 		Symbol          string            `json:"s"` // 交易对
 		Quantity        string            `json:"q"` // 订单原始数量
 		Price           string            `json:"p"` // 订单原始价格
@@ -638,7 +638,7 @@ type (
 	WsStrategyEvent struct {
 		Event           UserDataEventType `json:"e"`  // 事件类型
 		EventTime       int64             `json:"E"`  // 事件时间
-		TranscationTime int64             `json:"T"`  // 撮合时间
+		TransactionTime int64             `json:"T"`  // 撮合时间
 		StrategyEvent   WsStrategyUpdate  `json:"su"` // 策略事件
 	}
 
@@ -678,7 +678,7 @@ type (
 	WsConditionOrderRejectEvent struct {
 		Event           UserDataEventType `json:"e"` // 事件类型
 		EventTime       int64             `json:"E"` // 事件时间
-		TranscationTime int64             `json:"T"` // 撮合时间
+		TransactionTime int64             `json:"T"` // 撮合时间
 		OrderReject     WsOrderReject     `json:"or"`
 	}
 

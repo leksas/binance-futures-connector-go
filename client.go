@@ -304,7 +304,7 @@ func (c *Client) callAPI(ctx context.Context, r *request, opts ...RequestOption)
 	return data, nil
 }
 
-func newJSONV2(data []byte) (*fastjson.Value, error) {
+func newJSONv2(data []byte) (*fastjson.Value, error) {
 	var parser fastjson.Parser
 	v, err := parser.ParseBytes(data)
 	if err != nil {

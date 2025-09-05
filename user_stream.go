@@ -21,7 +21,7 @@ func (s *CreateListenKey) Do(ctx context.Context, opts ...RequestOption) (listen
 	if err != nil {
 		return "", err
 	}
-	j, err := newJSONV2(data)
+	j, err := newJSONv2(data)
 	if err != nil {
 		return "", err
 	}
