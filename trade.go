@@ -865,7 +865,7 @@ func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *G
 
 type GetOrderResponse struct {
 	ClientOrderId string       `json:"clientOrderId"`
-	OrderId       int          `json:"orderId"`
+	OrderId       int64        `json:"orderId"`
 	Symbol        string       `json:"symbol"`
 	Side          Side         `json:"side"`
 	PositionSide  PositionSide `json:"positionSide"`
@@ -965,7 +965,7 @@ func (s *GetAllOrdersService) Do(ctx context.Context, opts ...RequestOption) (re
 // Create NewAllOrdersResponse
 type NewAllOrdersResponse struct {
 	ClientOrderId string       `json:"clientOrderId"`
-	OrderId       int          `json:"orderId"`
+	OrderId       int64        `json:"orderId"`
 	Symbol        string       `json:"symbol"`
 	Side          Side         `json:"side"`
 	PositionSide  PositionSide `json:"positionSide"`
