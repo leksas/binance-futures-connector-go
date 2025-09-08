@@ -55,6 +55,11 @@ func (c *WebsocketStreamClient) SetBindIP(ip string) {
 
 	c.BindIP = ip
 	c.Endpoint = "wss://fstream-mm.binance.com"
+	if c.IsCombined {
+		c.Endpoint += "/stream?streams="
+	} else {
+		c.Endpoint += "/ws"
+	}
 }
 
 func newWsConfig(endpoint string, bindIP ...string) *WsConfig {
