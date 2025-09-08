@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -88,6 +89,38 @@ func NewClient(apiKey string, secretKey string, baseURL ...string) *Client {
 		Logger:     log.New(os.Stderr, Name, log.LstdFlags),
 		UseEd25519: false,
 	}
+}
+
+func NewEdClient(apiKey, privateKey string, baseURL ...string) (*Client, error) {
+	client := NewClient("", "", baseURL...)
+
+	pk, err := ParseEd25519PrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+	client.UseEd25519Keys(apiKey, pk)
+	return client, nil
+}
+
+func ParseEd25519PrivateKey(privateKeyStr string) (ed25519.PrivateKey, error) {
+	// 解码 base64 字符串
+	privateKeyBytes, err := base64.StdEncoding.DecodeString(privateKeyStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode base64 private key: %v", err)
+	}
+
+	// 解析私钥
+	privateKey, err := x509.ParsePKCS8PrivateKey(privateKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse PKCS8 private key: %v", err)
+	}
+
+	ed25519Key, ok := privateKey.(ed25519.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("not an Ed25519 private key")
+	}
+
+	return ed25519Key, nil
 }
 
 func (c *Client) UseEd25519Keys(apiKey string, privateKey ed25519.PrivateKey) {
@@ -558,6 +591,42 @@ func (c *Client) NewCancelOpenOrdersService() *CancelAllOpenOrdersService {
 // 查看当前全部挂单
 func (c *Client) NewGetOpenOrdersService() *GetOpenOrdersService {
 	return &GetOpenOrdersService{c: c}
+}
+
+// Binance Countdown Cancel All (POST /fapi/v1/countdownCancelAll)
+// 倒计时撤销所有订单
+func (c *Client) NewCountdownCancelAll() *CountdownCancelAllService {
+	return &CountdownCancelAllService{c: c}
+}
+
+// Binance Get Order (GET /fapi/v1/order)
+// 查询订单
+func (c *Client) NewGetOrderService() *GetOrderService {
+	return &GetOrderService{c: c}
+}
+
+// Binance Get All Orders (GET /fapi/v1/allOrders)
+// 查询所有订单
+func (c *Client) NewGetAllOrdersService() *GetAllOrdersService {
+	return &GetAllOrdersService{c: c}
+}
+
+// Binance Get Open Order (GET /fapi/v1/openOrder)
+// 查询当前挂单
+func (c *Client) NewGetOpenOrderService() *GetOpenOrderService {
+	return &GetOpenOrderService{c: c}
+}
+
+// Binance Get Force Orders (GET /fapi/v1/forceOrders)
+// 查询强平单历史
+func (c *Client) NewGetForceOrdersService() *GetForceOrdersService {
+	return &GetForceOrdersService{c: c}
+}
+
+// Binance Get User Trades (GET /fapi/v1/userTrades)
+// 账户成交历史
+func (c *Client) NewGetUserTradesService() *GetUserTradesService {
+	return &GetUserTradesService{c: c}
 }
 
 // Binance Set Margin Type (POST /fapi/v1/marginType)

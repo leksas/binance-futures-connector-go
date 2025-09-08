@@ -17,6 +17,7 @@ type (
 	StrategyStatus = string
 	OpCode         = int
 	UserDataType   = string
+	AutoCloseType  = string
 )
 
 var (
@@ -149,4 +150,7 @@ var (
 	StrategyUpdate                UserDataType = "STRATEGY_UPDATE"
 	GridUpdate                    UserDataType = "GRID_UPDATE"
 	ConditionalOrderTriggerReject UserDataType = "CONDITIONAL_ORDER_TRIGGER_REJECT"
+
+	LIQUIDATION AutoCloseType = "LIQUIDATION" // 强平单
+	ADL         AutoCloseType = "ADL"         // ADL 减仓单
 )

@@ -490,7 +490,7 @@ func (s *BatchModifyOrder) AddOrder(order Order) *BatchModifyOrder {
 	return s
 }
 
-func (s *BatchModifyOrder) Do(ctx context.Context, opts ...RequestOption) (res []ModifyOrderResponse, err error) {
+func (s *BatchModifyOrder) Do(ctx context.Context, opts ...RequestOption) (res []*ModifyOrderResponse, err error) {
 	r := &request{
 		method:   http.MethodPut,
 		endpoint: "/fapi/v1/batchOrders",
@@ -504,7 +504,8 @@ func (s *BatchModifyOrder) Do(ctx context.Context, opts ...RequestOption) (res [
 	if err != nil {
 		return nil, err
 	}
-	err = Unmarshal(data, res)
+	res = make([]*ModifyOrderResponse, 0)
+	err = Unmarshal(data, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -769,33 +770,72 @@ type NewOpenOrdersResponse struct {
 	GoodTillDate  int64        `json:"goodTillDate"`            //order pre-set auot cancel time for TIF GTD order
 }
 
-// TODO: Countdown Cancel All 倒计时撤销所有订单 (POST /fapi/v1/countdownCancelAll)
+// Countdown Cancel All (POST /fapi/v1/countdownCancelAll)
+// 请求权重 10
+type CountdownCancelAllService struct {
+	c             *Client
+	symbol        string
+	countdownTime int64
+}
+
+func (s *CountdownCancelAllService) Symbol(symbol string) *CountdownCancelAllService {
+	s.symbol = symbol
+	return s
+}
+
+func (s *CountdownCancelAllService) CountdownTime(countdownTime int64) *CountdownCancelAllService {
+	s.countdownTime = countdownTime
+	return s
+}
+
+func (s *CountdownCancelAllService) Do(ctx context.Context, opts ...RequestOption) (res *CountdownCancelAllResponse, err error) {
+	r := &request{
+		method:   http.MethodPost,
+		endpoint: "/fapi/v1/countdownCancelAll",
+		secType:  secTypeSigned,
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(CountdownCancelAllResponse)
+	err = Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type CountdownCancelAllResponse struct {
+	Symbol        string `json:"symbol"`
+	CountdownTime int64  `json:"countdownTime"`
+}
 
 // Get Order 查询订单 (GET /fapi/v1/order)
 // 请求权重 1
-type GetOrder struct {
+type GetOrderService struct {
 	c                 *Client
 	symbol            string
 	orderId           *int64
 	origClientOrderId *string
 }
 
-func (s *GetOrder) Symbol(symbol string) *GetOrder {
+func (s *GetOrderService) Symbol(symbol string) *GetOrderService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *GetOrder) OrderId(orderId int64) *GetOrder {
+func (s *GetOrderService) OrderId(orderId int64) *GetOrderService {
 	s.orderId = &orderId
 	return s
 }
 
-func (s *GetOrder) OrigClientOrderId(origClientOrderId string) *GetOrder {
+func (s *GetOrderService) OrigClientOrderId(origClientOrderId string) *GetOrderService {
 	s.origClientOrderId = &origClientOrderId
 	return s
 }
 
-func (s *GetOrder) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
+func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *GetOrderResponse, err error) {
 	r := &request{
 		method:   http.MethodGet,
 		endpoint: "/fapi/v1/order",
@@ -815,7 +855,7 @@ func (s *GetOrder) Do(ctx context.Context, opts ...RequestOption) (res *Order, e
 	if err != nil {
 		return nil, err
 	}
-	res = new(Order)
+	res = new(GetOrderResponse)
 	err = Unmarshal(data, res)
 	if err != nil {
 		return nil, err
@@ -823,17 +863,282 @@ func (s *GetOrder) Do(ctx context.Context, opts ...RequestOption) (res *Order, e
 	return res, nil
 }
 
-// TODO: Get All Orders 查询所有订单 (GET /fapi/v1/allOrders)
+type GetOrderResponse struct {
+	ClientOrderId string       `json:"clientOrderId"`
+	OrderId       int          `json:"orderId"`
+	Symbol        string       `json:"symbol"`
+	Side          Side         `json:"side"`
+	PositionSide  PositionSide `json:"positionSide"`
+	Type          OrderType    `json:"type"`
+	StopPrice     string       `json:"stopPrice"`
+	Price         string       `json:"price"`
+	ReduceOnly    bool         `json:"reduceOnly"`
+	ClosePosition bool         `json:"closePosition"`
+	TimeInForce   string       `json:"timeInForce"`
+	Status        OrderStatus  `json:"status"`
+	OrigQty       string       `json:"origQty"`
+	OrigType      OrderType    `json:"origType"`
+	AvgPrice      string       `json:"avgPrice"`
+	CumQuote      string       `json:"cumQuote"`
+	ExecutedQty   string       `json:"executedQty"`
+	Time          int64        `json:"time"`
+	ActivatePrice string       `json:"activatePrice"`
+	PriceRate     string       `json:"priceRate"`
+	UpdateTime    int64        `json:"updateTime"`
+	WorkingType   WorkingType  `json:"workingType"`
+	PriceProtect  bool         `json:"priceProtect"`
+	PriceMatch    PriceMatch   `json:"priceMatch"`
+	StpMode       STPMode      `json:"selfTradePreventionMode"`
+	GoodTillDate  int          `json:"goodTillDate"`
+}
 
-// TODO: Get Open Orders 查询当前全部挂单 (GET /fapi/v1/openOrders)
+// Get All Order 查询所有订单 (GET /fapi/v1/allOrders)
+// 请求权重 5
+type GetAllOrdersService struct {
+	c         *Client
+	symbol    string
+	orderId   *int64
+	startTime *int64
+	endTime   *int64
+	limit     *int
+}
 
-// TODO: Get Open Order 查询当前挂单 (GET /fapi/v1/openOrder)
+func (s *GetAllOrdersService) Symbol(symbol string) *GetAllOrdersService {
+	s.symbol = symbol
+	return s
+}
 
-// TODO: Get Force Orders 用户强平历史 (GET /fapi/v1/forceOrders)
+func (s *GetAllOrdersService) OrderId(orderId int64) *GetAllOrdersService {
+	s.orderId = &orderId
+	return s
+}
+
+func (s *GetAllOrdersService) StartTime(startTime int64) *GetAllOrdersService {
+	s.startTime = &startTime
+	return s
+}
+
+func (s *GetAllOrdersService) EndTime(endTime int64) *GetAllOrdersService {
+	s.endTime = &endTime
+	return s
+}
+
+func (s *GetAllOrdersService) Limit(limit int) *GetAllOrdersService {
+	s.limit = &limit
+	return s
+}
+
+func (s *GetAllOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*NewAllOrdersResponse, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/allOrders",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"symbol": s.symbol,
+	}
+	if s.orderId != nil {
+		m["orderId"] = *s.orderId
+	}
+	if s.startTime != nil {
+		m["startTime"] = *s.startTime
+	}
+	if s.endTime != nil {
+		m["endTime"] = *s.endTime
+	}
+	if s.limit != nil {
+		m["limit"] = *s.limit
+	}
+	r.setParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = make([]*NewAllOrdersResponse, 0)
+	err = Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// Create NewAllOrdersResponse
+type NewAllOrdersResponse struct {
+	ClientOrderId string       `json:"clientOrderId"`
+	OrderId       int          `json:"orderId"`
+	Symbol        string       `json:"symbol"`
+	Side          Side         `json:"side"`
+	PositionSide  PositionSide `json:"positionSide"`
+	Type          OrderType    `json:"type"`
+	StopPrice     string       `json:"stopPrice"`
+	Price         string       `json:"price"`
+	ReduceOnly    bool         `json:"reduceOnly"`
+	ClosePosition bool         `json:"closePosition"`
+	TimeInForce   string       `json:"timeInForce"`
+	Status        OrderStatus  `json:"status"`
+	OrigQty       string       `json:"origQty"`
+	OrigType      OrderType    `json:"origType"`
+	AvgPrice      string       `json:"avgPrice"`
+	CumQuote      string       `json:"cumQuote"`
+	ExecutedQty   string       `json:"executedQty"`
+	Time          int64        `json:"time"`
+	ActivatePrice string       `json:"activatePrice"`
+	PriceRate     string       `json:"priceRate"`
+	UpdateTime    int64        `json:"updateTime"`
+	WorkingType   WorkingType  `json:"workingType"`
+	PriceProtect  bool         `json:"priceProtect"`
+	PriceMatch    PriceMatch   `json:"priceMatch"`
+	StpMode       STPMode      `json:"selfTradePreventionMode"`
+	GoodTillDate  int          `json:"goodTillDate"`
+}
+
+// Get open Order 查询当前挂单 (GET /fapi/v1/openOrder)
+// 请求权重: 1
+type GetOpenOrderService struct {
+	c                 *Client
+	symbol            string
+	orderId           *int64
+	origClientOrderId *string
+}
+
+func (s *GetOpenOrderService) Symbol(symbol string) *GetOpenOrderService {
+	s.symbol = symbol
+	return s
+}
+
+func (s *GetOpenOrderService) OrderId(orderId int64) *GetOpenOrderService {
+	s.orderId = &orderId
+	return s
+}
+
+func (s *GetOpenOrderService) OrigClientOrderId(origClientOrderId *string) *GetOpenOrderService {
+	s.origClientOrderId = origClientOrderId
+	return s
+}
+
+func (s *GetOpenOrderService) Do(ctx context.Context, opts ...RequestOption) (res *NewOpenOrdersResponse, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/openOrder",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"symbol": s.symbol,
+	}
+	if s.orderId != nil {
+		m["orderId"] = *s.orderId
+	}
+	if s.origClientOrderId != nil {
+		m["origClientOrderId"] = *s.origClientOrderId
+	}
+	r.setParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(NewOpenOrdersResponse)
+	err = Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// Get force orders 用户强平单历史 (GET /fapi/v1/forceOrders)
+// 请求权重 20 (不带symbol 50)
+type GetForceOrdersService struct {
+	c             *Client
+	symbol        *string
+	autoCloseType *AutoCloseType
+	startTime     *int64
+	endTime       *int64
+	limit         *int
+}
+
+func (s *GetForceOrdersService) Symbol(symbol string) *GetForceOrdersService {
+	s.symbol = &symbol
+	return s
+}
+
+func (s *GetForceOrdersService) AutoCloseType(autoCloseType AutoCloseType) *GetForceOrdersService {
+	s.autoCloseType = &autoCloseType
+	return s
+}
+
+func (s *GetForceOrdersService) StartTime(startTime int64) *GetForceOrdersService {
+	s.startTime = &startTime
+	return s
+}
+
+func (s *GetForceOrdersService) EndTime(endTime int64) *GetForceOrdersService {
+	s.endTime = &endTime
+	return s
+}
+
+func (s *GetForceOrdersService) Limit(limit int) *GetForceOrdersService {
+	s.limit = &limit
+	return s
+}
+
+func (s *GetForceOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*NewForceOrderResponse, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/forceOrder",
+		secType:  secTypeSigned,
+	}
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+	if s.autoCloseType != nil {
+		r.setParam("autoCloseType", *s.autoCloseType)
+	}
+	if s.startTime != nil {
+		r.setParam("startTime", *s.startTime)
+	}
+	if s.endTime != nil {
+		r.setParam("endTime", *s.endTime)
+	}
+	if s.limit != nil {
+		r.setParam("limit", *s.limit)
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = make([]*NewForceOrderResponse, 0)
+	err = Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type NewForceOrderResponse struct {
+	OrderId       int64        `json:"orderId"`
+	Symbol        string       `json:"symbol"`
+	Status        OrderStatus  `json:"status"`
+	ClientOrderId string       `json:"clientOrderId"`
+	Price         string       `json:"price"`
+	AvgPrice      string       `json:"avgPrice"`
+	OrigQty       string       `json:"origQty"`
+	ExecutedQty   string       `json:"executedQty"`
+	CumQuote      string       `json:"cumQuote"`
+	TimeInForce   TimeInForce  `json:"timeInForce"`
+	Type          OrderType    `json:"type"`
+	ReduceOnly    bool         `json:"reduceOnly"`
+	ClosePosition bool         `json:"closePosition"`
+	Side          Side         `json:"side"`
+	PositionSide  PositionSide `json:"positionSide"`
+	StopPrice     string       `json:"stopPrice"`
+	WorkingType   WorkingType  `json:"workingType"`
+	OrigType      OrderType    `json:"origType"`
+	Time          int64        `json:"time"`
+	UpdateTime    int64        `json:"updateTime"`
+}
 
 // Get User Trades 账户成交历史 (GET /fapi/v1/userTrades)
 // 请求权重 5
-type UserTrades struct {
+type GetUserTradesService struct {
 	c         *Client
 	symbol    string
 	orderId   *int64
@@ -843,37 +1148,37 @@ type UserTrades struct {
 	limit     *int // 默认500, 最大1000
 }
 
-func (s *UserTrades) Symbol(symbol string) *UserTrades {
+func (s *GetUserTradesService) Symbol(symbol string) *GetUserTradesService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *UserTrades) OrderId(orderId int64) *UserTrades {
+func (s *GetUserTradesService) OrderId(orderId int64) *GetUserTradesService {
 	s.orderId = &orderId
 	return s
 }
 
-func (s *UserTrades) StartTime(startTime int64) *UserTrades {
+func (s *GetUserTradesService) StartTime(startTime int64) *GetUserTradesService {
 	s.startTime = &startTime
 	return s
 }
 
-func (s *UserTrades) EndTime(endTime int64) *UserTrades {
+func (s *GetUserTradesService) EndTime(endTime int64) *GetUserTradesService {
 	s.endTime = &endTime
 	return s
 }
 
-func (s *UserTrades) FromId(fromId int64) *UserTrades {
+func (s *GetUserTradesService) FromId(fromId int64) *GetUserTradesService {
 	s.fromId = &fromId
 	return s
 }
 
-func (s *UserTrades) Limit(limit int) *UserTrades {
+func (s *GetUserTradesService) Limit(limit int) *GetUserTradesService {
 	s.limit = &limit
 	return s
 }
 
-func (s *UserTrades) Do(ctx context.Context, opts ...RequestOption) (res []*UserTradeResponse, err error) {
+func (s *GetUserTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*UserTradeResponse, err error) {
 	r := &request{
 		method:   http.MethodGet,
 		endpoint: "/fapi/v1/userTrades",
@@ -903,7 +1208,7 @@ func (s *UserTrades) Do(ctx context.Context, opts ...RequestOption) (res []*User
 		return nil, err
 	}
 	res = make([]*UserTradeResponse, 0)
-	err = Unmarshal(data, res)
+	err = Unmarshal(data, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -1174,7 +1479,7 @@ func (s *PositionRisk) Do(ctx context.Context, opts ...RequestOption) (res []*Po
 		return nil, err
 	}
 	res = make([]*PositionRiskResponse, 0)
-	err = Unmarshal(data, res)
+	err = Unmarshal(data, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -1326,7 +1631,7 @@ func (s *PositionMarginHist) Do(ctx context.Context, opts ...RequestOption) (res
 		return nil, err
 	}
 	res = make([]*PositionMarginHistResponse, 0)
-	err = Unmarshal(data, res)
+	err = Unmarshal(data, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -1345,7 +1650,7 @@ type PositionMarginHistResponse struct {
 
 // Order Test 下单测试 (GET /fapi/v1/order/test)
 // 用于测试订单请求，但不会提交到撮合引擎
-type OrderTest struct {
+type OrderTestService struct {
 	c                *Client
 	symbol           string
 	side             Side
@@ -1368,102 +1673,102 @@ type OrderTest struct {
 	goodTillDate     *int64
 }
 
-func (s *OrderTest) Symbol(symbol string) *OrderTest {
+func (s *OrderTestService) Symbol(symbol string) *OrderTestService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *OrderTest) Side(side Side) *OrderTest {
+func (s *OrderTestService) Side(side Side) *OrderTestService {
 	s.side = side
 	return s
 }
 
-func (s *OrderTest) PositionSide(positionSide PositionSide) *OrderTest {
+func (s *OrderTestService) PositionSide(positionSide PositionSide) *OrderTestService {
 	s.positionSide = &positionSide
 	return s
 }
 
-func (s *OrderTest) OrderType(orderType OrderType) *OrderTest {
+func (s *OrderTestService) OrderType(orderType OrderType) *OrderTestService {
 	s.orderType = orderType
 	return s
 }
 
-func (s *OrderTest) ReduceOnly(reduceOnly string) *OrderTest {
+func (s *OrderTestService) ReduceOnly(reduceOnly string) *OrderTestService {
 	s.reduceOnly = &reduceOnly
 	return s
 }
 
-func (s *OrderTest) Quantity(quantity float64) *OrderTest {
+func (s *OrderTestService) Quantity(quantity float64) *OrderTestService {
 	s.quantity = &quantity
 	return s
 }
 
-func (s *OrderTest) Price(price float64) *OrderTest {
+func (s *OrderTestService) Price(price float64) *OrderTestService {
 	s.price = &price
 	return s
 }
 
-func (s *OrderTest) NewClientOrderId(newClientOrderId string) *OrderTest {
+func (s *OrderTestService) NewClientOrderId(newClientOrderId string) *OrderTestService {
 	s.newClientOrderId = &newClientOrderId
 	return s
 }
 
-func (s *OrderTest) StopPrice(stopPrice float64) *OrderTest {
+func (s *OrderTestService) StopPrice(stopPrice float64) *OrderTestService {
 	s.stopPrice = &stopPrice
 	return s
 }
 
-func (s *OrderTest) ClosePosition(closePosition bool) *OrderTest {
+func (s *OrderTestService) ClosePosition(closePosition bool) *OrderTestService {
 	s.closePosition = &closePosition
 	return s
 }
 
-func (s *OrderTest) ActivationPrice(activationPrice float64) *OrderTest {
+func (s *OrderTestService) ActivationPrice(activationPrice float64) *OrderTestService {
 	s.activationPrice = &activationPrice
 	return s
 }
 
-func (s *OrderTest) CallbackRate(callbackRate float64) *OrderTest {
+func (s *OrderTestService) CallbackRate(callbackRate float64) *OrderTestService {
 	s.callbackRate = &callbackRate
 	return s
 }
 
-func (s *OrderTest) TimeInForce(timeInForce TimeInForce) *OrderTest {
+func (s *OrderTestService) TimeInForce(timeInForce TimeInForce) *OrderTestService {
 	s.timeInForce = &timeInForce
 	return s
 }
 
-func (s *OrderTest) WorkingType(workingType WorkingType) *OrderTest {
+func (s *OrderTestService) WorkingType(workingType WorkingType) *OrderTestService {
 	s.workingType = &workingType
 	return s
 }
 
-func (s *OrderTest) PriceProtect(priceProtect bool) *OrderTest {
+func (s *OrderTestService) PriceProtect(priceProtect bool) *OrderTestService {
 	s.priceProtect = &priceProtect
 	return s
 }
 
-func (s *OrderTest) NewOrderRespType(newOrderRespType OrderRespType) *OrderTest {
+func (s *OrderTestService) NewOrderRespType(newOrderRespType OrderRespType) *OrderTestService {
 	s.newOrderRespType = &newOrderRespType
 	return s
 }
 
-func (s *OrderTest) PriceMatch(priceMatch PriceMatch) *OrderTest {
+func (s *OrderTestService) PriceMatch(priceMatch PriceMatch) *OrderTestService {
 	s.priceMatch = &priceMatch
 	return s
 }
 
-func (s *OrderTest) StpMode(stpMode STPMode) *OrderTest {
+func (s *OrderTestService) StpMode(stpMode STPMode) *OrderTestService {
 	s.stpMode = &stpMode
 	return s
 }
 
-func (s *OrderTest) GoodTillDate(goodTillDate int64) *OrderTest {
+func (s *OrderTestService) GoodTillDate(goodTillDate int64) *OrderTestService {
 	s.goodTillDate = &goodTillDate
 	return s
 }
 
-func (s *OrderTest) Do(ctx context.Context, opts ...RequestOption) (res interface{}, err error) {
+func (s *OrderTestService) Do(ctx context.Context, opts ...RequestOption) (res interface{}, err error) {
 	respType := ACK
 	r := &request{
 		method:   http.MethodGet,
