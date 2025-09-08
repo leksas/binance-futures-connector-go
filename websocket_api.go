@@ -87,6 +87,17 @@ func NewWebsocketAPIClient(apiKey string, apiSecret string, baseURL ...string) *
 	}
 }
 
+func NewEdWebsocketAPIClient(apiKey string, privateKey string, baseURL ...string) (*WebsocketAPIClient, error) {
+	client := NewWebsocketAPIClient("", "", baseURL...)
+
+	pk, err := ParseEd25519PrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+	client.UseEd25519Keys(apiKey, pk)
+	return client, nil
+}
+
 func (c *WebsocketAPIClient) UseEd25519Keys(apiKey string, privateKey ed25519.PrivateKey) {
 	c.APIKey = apiKey
 	c.Ed25519APIKey = apiKey
