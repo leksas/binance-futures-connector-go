@@ -549,7 +549,7 @@ func (c *Client) NewGetBalanceService() *GetBalanceService {
 	return &GetBalanceService{c: c}
 }
 
-// Binance Get Account (GET /fapi/v1/account)
+// Binance Get Account (GET /fapi/v3/account)
 // 获取账户信息
 func (c *Client) NewGetAccountService() *GetAccountService {
 	return &GetAccountService{c: c}

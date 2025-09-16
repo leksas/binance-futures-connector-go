@@ -594,9 +594,9 @@ func (w *WebsocketAPIClient) NewExchangeInformationService() *ExchangeInformatio
 }
 
 // Account Websocket API Endpoints:
-// func (w *WebsocketAPIClient) NewAccountInformationService() *AccountInformationService {
-// 	return &AccountInformationService{websocketAPI: w}
-// }
+func (w *WebsocketAPIClient) NewAccountInformationService() *AccountInformationService {
+	return &AccountInformationService{websocketAPI: w}
+}
 
 // func (w *WebsocketAPIClient) NewAccountOrderRateLimitsService() *AccountOrderRateLimitsService {
 // 	return &AccountOrderRateLimitsService{websocketAPI: w}

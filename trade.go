@@ -889,7 +889,7 @@ type GetOrderResponse struct {
 	PriceProtect  bool         `json:"priceProtect"`
 	PriceMatch    PriceMatch   `json:"priceMatch"`
 	StpMode       STPMode      `json:"selfTradePreventionMode"`
-	GoodTillDate  int          `json:"goodTillDate"`
+	GoodTillDate  int64        `json:"goodTillDate"`
 }
 
 // Get All Order 查询所有订单 (GET /fapi/v1/allOrders)
@@ -989,7 +989,7 @@ type NewAllOrdersResponse struct {
 	PriceProtect  bool         `json:"priceProtect"`
 	PriceMatch    PriceMatch   `json:"priceMatch"`
 	StpMode       STPMode      `json:"selfTradePreventionMode"`
-	GoodTillDate  int          `json:"goodTillDate"`
+	GoodTillDate  int64        `json:"goodTillDate"`
 }
 
 // Get open Order 查询当前挂单 (GET /fapi/v1/openOrder)
