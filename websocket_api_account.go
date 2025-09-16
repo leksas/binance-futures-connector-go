@@ -62,22 +62,6 @@ type AccountInformationResponse struct {
 	ID         string              `json:"id"`
 	Status     int                 `json:"status"`
 	Error      *WsAPIErrorResponse `json:"error,omitempty"`
-	Result     *AccountInformation `json:"result,omitempty"`
+	Result     *Account            `json:"result,omitempty"`
 	RateLimits []*WsAPIRateLimit   `json:"rateLimits"`
-}
-
-type AccountInformation struct {
-	TotalInitialMargin          string     `json:"totalInitialMargin"`          // 当前所需起始保证金总额(存在逐仓请忽略), 仅计算usdt资产positions), only for USDT asset
-	TotalMaintMargin            string     `json:"totalMaintMargin"`            // 维持保证金总额, 仅计算usdt资产
-	TotalWalletBalance          string     `json:"totalWalletBalance"`          // 账户总余额, 仅计算usdt资产
-	TotalUnrealizedProfit       string     `json:"totalUnrealizedProfit"`       // 持仓未实现盈亏总额, 仅计算usdt资产
-	TotalMarginBalance          string     `json:"totalMarginBalance"`          // 保证金总余额, 仅计算usdt资产
-	TotalPositionInitialMargin  string     `json:"totalPositionInitialMargin"`  // 持仓所需起始保证金(基于最新标记价格), 仅计算usdt资产
-	TotalOpenOrderInitialMargin string     `json:"totalOpenOrderInitialMargin"` // 当前挂单所需起始保证金(基于最新标记价格), 仅计算usdt资产
-	TotalCrossWalletBalance     string     `json:"totalCrossWalletBalance"`     // 全仓账户余额, 仅计算usdt资产
-	TotalCrossUnPnl             string     `json:"totalCrossUnPnl"`             // 全仓持仓未实现盈亏总额, 仅计算usdt资产
-	AvailableBalance            string     `json:"availableBalance"`            // 可用余额, 仅计算usdt资产
-	MaxWithdrawAmount           string     `json:"maxWithdrawAmount"`           // 最大可转出余额, 仅计算usdt资产
-	Assets                      []Asset    `json:"assets"`
-	Positions                   []Position `json:"positions"`
 }
