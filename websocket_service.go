@@ -626,7 +626,7 @@ type (
 		TransactionTime int64             `json:"T"` // 撮合时间
 		LeverageConfig  struct {
 			Symbol   string `json:"s"` // 交易对
-			Leverage string `json:"l"` // 杠杆倍数
+			Leverage int    `json:"l"` // 杠杆倍数
 		} `json:"ac,omitempty"`
 		MarginConfig struct { // 用户账户配置
 			MultiAssetMargin bool `json:"j"` // 联合保证金状态
