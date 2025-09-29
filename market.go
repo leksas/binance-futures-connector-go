@@ -151,7 +151,7 @@ type SymbolFilter struct {
 	MinQty              string `json:"minQty"`
 	StepSize            string `json:"stepSize"`
 	Limit               int    `json:"limit"`
-	Notinal             string `json:"notional"`
+	Notional            string `json:"notional"`
 	MultiplierUp        string `json:"multiplierUp"`
 	MultiplierDown      string `json:"multiplierDown"`
 	MultiplierDecimal   string `json:"multiplierDecimal"`
