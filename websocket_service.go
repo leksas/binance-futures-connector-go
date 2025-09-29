@@ -491,7 +491,7 @@ type (
 	// 当前连接使用的有效listenKey过期时，user data stream 将会推送此事件
 	WsListenKeyExpiredEvent struct {
 		Event     UserDataEventType `json:"e"` // 事件类型
-		EventTime int64             `json:"E"` // 事件时间
+		EventTime string            `json:"E"` // 事件时间
 		ListenKey string            `json:"listenKey"`
 	}
 
