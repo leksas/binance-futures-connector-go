@@ -999,9 +999,9 @@ type Ticker24hrResponse struct {
 	QuoteVolume        string `json:"quoteVolume"`        // 24小时成交额
 	OpenTime           int64  `json:"openTime"`           // 24小时内，第一笔交易的发生时间
 	CloseTime          int64  `json:"closeTime"`          // 24小时内，最后一笔交易的发生时间
-	FirstId            int64  `json:"firstId"`            // 首笔成交id
-	LastId             int64  `json:"lastId"`             // 末笔成交id
-	Count              int64  `json:"count"`              // 成交笔数
+	FirstTradeID       int64  `json:"firstTradeID"`       // 首笔成交id
+	LastTradeID        int64  `json:"lastTradeID"`        // 末笔成交id
+	TradeCount         int64  `json:"tradeCount"`         // 成交笔数
 }
 
 // Binance Symbol Price Ticker (GET /fapi/v2/ticker/price)

@@ -597,6 +597,26 @@ type WsMarkPriceEvent struct {
 // WsMarkPriceHandler handle websocket mark price event
 type WsMarkPriceHandler func(event *WsMarkPriceEvent)
 
+// WsMarkPriceServe serve websocket mark price handler with a symbol
+func (c *WebsocketStreamClient) WsMarkPriceServe(symbol string, everySecond bool, handler WsMarkPriceHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := fmt.Sprintf("%s/%s@markPrice", c.Endpoint, strings.ToLower(symbol))
+	if everySecond {
+		endpoint = fmt.Sprintf("%s@markPrice@1s", strings.ToLower(symbol))
+	}
+
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		event := new(WsMarkPriceEvent)
+		err := Unmarshal(message, event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
+		handler(event)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
+
 // WsCombinedMarkPriceServe is similar to WsMarkPriceServe, but it handles multiple symbol
 func (c *WebsocketStreamClient) WsCombinedMarkPriceServe(symbols []string, everySecond bool, handler WsMarkPriceHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
 	endpoint := c.Endpoint
@@ -617,6 +637,110 @@ func (c *WebsocketStreamClient) WsCombinedMarkPriceServe(symbols []string, every
 			return
 		}
 
+		handler(event.Data)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
+
+type WsMinTickerEvent struct {
+	Event       string `json:"e"`
+	EventTime   int64  `json:"E"`
+	Symbol      string `json:"s"`
+	Close       string `json:"c"`
+	Open        string `json:"o"`
+	High        string `json:"h"`
+	Low         string `json:"l"`
+	TotalVolume string `json:"v"`
+	TotalAmount string `json:"q"`
+}
+
+type WsCombinedMiniTickerEvent struct {
+	Data   *WsMinTickerEvent `json:"data"`
+	Stream string            `json:"stream"`
+}
+
+// WsMarkTickerHandler handle websocket mark ticker event
+type WsMiniTickerHandler func(event *WsMinTickerEvent)
+
+// WsMiniTickerServe serve websocket mini ticker handler with a symbol
+func (c *WebsocketStreamClient) WsMiniTickerServe(symbol string, handler WsMiniTickerHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := fmt.Sprintf("%s/%s@miniTicker", c.Endpoint, strings.ToLower(symbol))
+
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		event := new(WsMinTickerEvent)
+		err := Unmarshal(message, event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
+		handler(event)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
+
+// WsCombinedMiniTickerServe is similar to WsMiniTickerServe, but it handles multiple symbol
+func (c *WebsocketStreamClient) WsCombinedMiniTickerServe(symbols []string, everySecond bool, handler WsMiniTickerHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := c.Endpoint
+	for s := range symbols {
+		endpoint += fmt.Sprintf("%s@miniPrice", strings.ToLower(symbols[s])) + "/"
+	}
+	endpoint = endpoint[:len(endpoint)-1]
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		event := new(WsCombinedMiniTickerEvent)
+		err = Unmarshal(message, event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
+
+		handler(event.Data)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
+
+type WsTickerArrEvent struct {
+	Event              string `json:"e"`
+	EventTime          int64  `json:"E"`
+	Symbol             string `json:"s"`
+	PriceChange        string `json:"p"`
+	PriceChangePercent string `json:"P"`
+	WeightedAvgPrice   string `json:"w"`
+	Close              string `json:"c"`
+	Quantity           string `json:"Q"`
+	Open               string `json:"o"`
+	High               string `json:"h"`
+	Low                string `json:"l"`
+	TotalVolume        string `json:"v"`
+	TotalAmount        string `json:"q"`
+	OpenTime           int64  `json:"O"`
+	CloseTime          int64  `json:"C"`
+	FirstTradeID       int64  `json:"F"`
+	LastTradeID        int64  `json:"L"`
+	TradeCount         int64  `json:"n"`
+}
+
+type WsCombinedTickerArrEvent struct {
+	Data   []*WsTickerArrEvent `json:"data"`
+	Stream string              `json:"stream"`
+}
+
+// WsMarkTickerHandler handle websocket mark ticker event
+type WsTickerArrHandler func(event []*WsTickerArrEvent)
+
+// WsTickerArrServe serve websocket ticker arr handler with all symbol
+func (c *WebsocketStreamClient) WsCombinedTickerArrServe(handler WsTickerArrHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := fmt.Sprintf("%s/!ticker@arr", c.Endpoint)
+
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		event := new(WsCombinedTickerArrEvent)
+		err := Unmarshal(message, event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
 		handler(event.Data)
 	}
 	return wsServe(cfg, wsHandler, errHandler)
