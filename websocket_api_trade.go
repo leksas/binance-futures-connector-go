@@ -919,11 +919,11 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 }
 
 type AlgoOrderPlacementResponse struct {
-	ID         string                      `json:"id"`
-	Status     int                         `json:"status"`
-	Error      *WsAPIErrorResponse         `json:"error,omitempty"`
-	Result     *AlgoOrderPlacementResponse `json:"result"`
-	RateLimits []*WsAPIRateLimit           `json:"rateLimits,omitempty"`
+	ID         string                    `json:"id"`
+	Status     int                       `json:"status"`
+	Error      *WsAPIErrorResponse       `json:"error,omitempty"`
+	Result     *AlgoOrderPlacementResult `json:"result"`
+	RateLimits []*WsAPIRateLimit         `json:"rateLimits,omitempty"`
 }
 
 type AlgoOrderPlacementResult struct {
