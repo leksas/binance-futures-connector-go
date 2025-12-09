@@ -1100,7 +1100,7 @@ type (
 		TimeInForce   TimeInForce  `json:"f"`    // 有效方式
 		Quantity      string       `json:"q"`    // 订单数量
 		Status        OrderStatus  `json:"X"`    // 条件单状态
-		OrderID       int64        `json:"ai"`   // 触发后普通订单 id
+		OrderID       string       `json:"ai"`   // 触发后普通订单 id
 		AvgPrice      string       `json:"ap"`   // 触发后在撮合引擎中实际订单的平均成交价格，仅在订单被触发并进入撮合引擎时显示
 		FilledVolume  string       `json:"aq"`   // 触发后在撮合引擎中实际订单已成交数量，仅当订单被触发并进入撮合引擎时显示
 		ActualType    string       `json:"act"`  // 触发后在撮合引擎中实际的订单类型，仅当订单被触发并进入撮合引擎时显示
