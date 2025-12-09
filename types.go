@@ -18,6 +18,8 @@ type (
 	OpCode         = int
 	UserDataType   = string
 	AutoCloseType  = string
+	IncomeType     = string
+	AlgoType       = string
 )
 
 var (
@@ -141,16 +143,42 @@ var (
 	OpCode8014 OpCode = 8014 // 不符合 Futures Trading Quantitative Rules，策略终止
 	OpCode8015 OpCode = 8015 // 无仓位或是仓位已经爆仓
 
-	ListenKeyExpired              UserDataType = "listenKeyExpired"
-	AccountDataUpdate             UserDataType = "ACCOUNT_UPDATE"
-	MarginCall                    UserDataType = "MARGIN_CALL"
-	OrderTradeUpdate              UserDataType = "ORDER_TRADE_UPDATE"
-	TradeLite                     UserDataType = "TRADE_LITE"
-	AccountConfigUpdate           UserDataType = "ACCOUNT_CONFIG_UPDATE"
-	StrategyUpdate                UserDataType = "STRATEGY_UPDATE"
-	GridUpdate                    UserDataType = "GRID_UPDATE"
-	ConditionalOrderTriggerReject UserDataType = "CONDITIONAL_ORDER_TRIGGER_REJECT"
+	ListenKeyExpired              UserDataType = "listenKeyExpired"                 // listenKey过期推送
+	AccountDataUpdate             UserDataType = "ACCOUNT_UPDATE"                   // Balance 和 Position 更新推送
+	MarginCall                    UserDataType = "MARGIN_CALL"                      // 追加保证金通知
+	OrderTradeUpdate              UserDataType = "ORDER_TRADE_UPDATE"               // 订单交易更新推送
+	TradeLite                     UserDataType = "TRADE_LITE"                       // 精简交易推送
+	AccountConfigUpdate           UserDataType = "ACCOUNT_CONFIG_UPDATE"            // 杠杆倍数等账户配置 更新推送
+	StrategyUpdate                UserDataType = "STRATEGY_UPDATE"                  // 策略交易更新推送
+	GridUpdate                    UserDataType = "GRID_UPDATE"                      // 网格更新推送
+	ConditionalOrderTriggerReject UserDataType = "CONDITIONAL_ORDER_TRIGGER_REJECT" // 条件订单(TP/SL)触发后拒绝更新推送
+	AlgoUpdate                    UserDataType = "ALGO_UPDATE"                      // 条件订单交易更新推送
 
 	LIQUIDATION AutoCloseType = "LIQUIDATION" // 强平单
 	ADL         AutoCloseType = "ADL"         // ADL 减仓单
+
+	Conditional AlgoType = "CONDITIONAL"
+
+	TRANSFER                    IncomeType = "TRANSFER"                    // 转账
+	WELCOME_BONUS               IncomeType = "WELCOME_BONUS"               // 欢迎奖金
+	REALIZED_PNL                IncomeType = "REALIZED_PNL"                // 已实现盈亏
+	FUNDING_FEE                 IncomeType = "FUNDING_FEE"                 // 资金费用
+	COMMISSION                  IncomeType = "COMMISSION"                  // 佣金
+	INSURANCE_CLEAR             IncomeType = "INSURANCE_CLEAR"             // 强平
+	REFERRAL_KICKBACK           IncomeType = "REFERRAL_KICKBACK"           // 推荐人返佣
+	COMMISSION_REBATE           IncomeType = "COMMISSION_REBATE"           // 被推荐人返佣
+	API_REBATE                  IncomeType = "API_REBATE"                  // API佣金回扣
+	CONTEST_REWARD              IncomeType = "CONTEST_REWARD"              // 交易大赛奖金
+	CROSS_COLLATERAL_TRANSFER   IncomeType = "CROSS_COLLATERAL_TRANSFER"   // cc转账
+	OPTIONS_PREMIUM_FEE         IncomeType = "OPTIONS_PREMIUM_FEE"         // 期权购置手续费
+	OPTIONS_SETTLE_PROFIT       IncomeType = "OPTIONS_SETTLE_PROFIT"       // 期权行权收益
+	INTERNAL_TRANSFER           IncomeType = "INTERNAL_TRANSFER"           // 内部账户，给普通用户划转
+	AUTO_EXCHANGE               IncomeType = "AUTO_EXCHANGE"               // 自动兑换
+	DELIVERED_SETTELMENT        IncomeType = "DELIVERED_SETTELMENT"        // 下架结算
+	COIN_SWAP_DEPOSIT           IncomeType = "COIN_SWAP_DEPOSIT"           // 闪兑转入
+	COIN_SWAP_WITHDRAW          IncomeType = "COIN_SWAP_WITHDRAW"          // 闪兑转出
+	POSITION_LIMIT_INCREASE_FEE IncomeType = "POSITION_LIMIT_INCREASE_FEE" // 仓位限制上调费用
+	STRATEGY_UMFUTURES_TRANSFER IncomeType = "STRATEGY_UMFUTURES_TRANSFER" // UM策略子账户划转
+	FEE_RETURN                  IncomeType = "FEE_RETURN"                  // 策略交易手续费退还
+	BFUSD_REWARD                IncomeType = "BFUSD_REWARD"                // BFUSD每日奖励
 )

@@ -688,33 +688,13 @@ func (w *WebsocketAPIClient) NewAccountPositionService() *AccountPositionService
 	return &AccountPositionService{websocketAPI: w}
 }
 
-// func (w *WebsocketAPIClient) NewCancelReplaceOrderService() *OrderCancelReplaceService {
-// 	return &OrderCancelReplaceService{websocketAPI: w}
-// }
+func (w *WebsocketAPIClient) NewAlgoOrderPlacementService() *AlgoOrderPlacementService {
+	return &AlgoOrderPlacementService{websocketAPI: w}
+}
 
-// func (w *WebsocketAPIClient) NewCurrentOpenOrdersService() *OpenOrdersStatusService {
-// 	return &OpenOrdersStatusService{websocketAPI: w}
-// }
-
-// func (w *WebsocketAPIClient) NewCancelOpenOrdersService() *OpenOrdersCancelAllService {
-// 	return &OpenOrdersCancelAllService{websocketAPI: w}
-// }
-
-// func (w *WebsocketAPIClient) NewPlaceOCOService() *OrderListPlaceService {
-// 	return &OrderListPlaceService{websocketAPI: w}
-// }
-
-// func (w *WebsocketAPIClient) NewQueryOCOService() *OrderListStatusService {
-// 	return &OrderListStatusService{websocketAPI: w}
-// }
-
-// func (w *WebsocketAPIClient) NewCurrentOpenOCOService() *OpenOrderListsStatusService {
-// 	return &OpenOrderListsStatusService{websocketAPI: w}
-// }
-
-// func (w *WebsocketAPIClient) NewCancelOCOService() *OrderListCancelService {
-// 	return &OrderListCancelService{websocketAPI: w}
-// }
+func (w *WebsocketAPIClient) NewAlgoOrderCancelService() *AlgoOrderCancelService {
+	return &AlgoOrderCancelService{websocketAPI: w}
+}
 
 // User Data Websocket API Endpoints:
 func (w *WebsocketAPIClient) NewStartUserDataStreamService() *StartUserDataStreamService {

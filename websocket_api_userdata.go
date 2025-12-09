@@ -355,6 +355,34 @@ type ListStatusEvent struct {
 	} `json:"O"`
 }
 
+type AlgoOrder struct {
+	ClientAlgoID  string
+	AlgoID        int64
+	AlgoType      string
+	OrderType     OrderType
+	Symbol        string
+	Side          Side
+	PositionSide  PositionSide
+	TimeInForce   TimeInForce
+	Quantity      float64
+	Price         string
+	OrderStatus   OrderStatus
+	OrderID       int64
+	AvgPrice      float64
+	FilledVolume  float64
+	Act           string // 触发后在撮合引擎中实际的订单类型，仅当订单被触发并进入撮合引擎时显示
+	TriggerPrice  float64
+	StopMode      STPMode
+	WorkingType   WorkingType
+	PriceMatch    PriceMatch
+	ClosePosition bool
+	PriceProtect  string
+	ReduceOnly    bool
+	TriggerTime   int64
+	GoodTillDate  int64
+	RejectReason  string
+}
+
 var ParseUserDataJsonRsp = parseUserDataJsonRsp
 
 func parseUserDataJsonRsp(message []byte) (*UserDataEvent, error) {
@@ -434,6 +462,8 @@ func parseUserDataJsonRsp(message []byte) (*UserDataEvent, error) {
 				// WorkingTime:   data.GetInt64("W"),
 			}
 			return &event, nil
+		case AlgoUpdate:
+			
 		default:
 			event.ExecutionReport = ExecutionReport{
 				Symbol:                  string(data.GetStringBytes("s")),
@@ -546,6 +576,12 @@ type orderReport struct {
 	Symbol        string
 	OrderId       int64
 	ClientOrderId string
+}
+
+type ConditionalOrderReject struct {
+	Symbol       string
+	OrderID      int64
+	RejectReason string
 }
 
 type SubscribeUserDataStreamResponse struct {

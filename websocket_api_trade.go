@@ -202,7 +202,7 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 		parameters["priceMatch"] = *s.priceMatch
 	}
 	if s.stpMode != nil {
-		parameters["stp"] = *s.stpMode
+		parameters["selfTradePreventionMode"] = *s.stpMode
 	}
 	if s.goodTillDate != nil {
 		parameters["goodTillDate"] = Int64ToString(*s.goodTillDate)
@@ -688,4 +688,336 @@ func BoolToString(b bool) string {
 		return "true"
 	}
 	return "false"
+}
+
+type AlgoOrderPlacementService struct {
+	websocketAPI     *WebsocketAPIClient
+	algoType         string
+	symbol           string
+	side             Side
+	positionSide     *PositionSide
+	orderType        OrderType
+	timeInForce      *TimeInForce
+	quantity         *float64
+	price            *float64
+	triggerPrice     *float64
+	workingType      *WorkingType
+	priceMatch       *string
+	closePosition    *bool
+	priceProtect     *string
+	reduceOnly       *bool
+	activationPrice  *float64
+	callbackRate     *float64
+	clientAlgoID     *string
+	newOrderRespType *OrderRespType
+	stpMode          *STPMode
+	goodTillDate     *int64
+	recvWindow       *int64
+}
+
+func (s *AlgoOrderPlacementService) AlgoType(algoType string) *AlgoOrderPlacementService {
+	s.algoType = algoType
+	return s
+}
+
+func (s *AlgoOrderPlacementService) Symbol(symbol string) *AlgoOrderPlacementService {
+	s.symbol = symbol
+	return s
+}
+
+func (s *AlgoOrderPlacementService) Side(side Side) *AlgoOrderPlacementService {
+	s.side = side
+	return s
+}
+
+func (s *AlgoOrderPlacementService) PositionSide(positionSide PositionSide) *AlgoOrderPlacementService {
+	s.positionSide = &positionSide
+	return s
+}
+
+func (s *AlgoOrderPlacementService) OrderType(orderType OrderType) *AlgoOrderPlacementService {
+	s.orderType = orderType
+	return s
+}
+
+func (s *AlgoOrderPlacementService) TimeInForce(timeInForce TimeInForce) *AlgoOrderPlacementService {
+	s.timeInForce = &timeInForce
+	return s
+}
+
+func (s *AlgoOrderPlacementService) Quantity(quantity float64) *AlgoOrderPlacementService {
+	s.quantity = &quantity
+	return s
+}
+
+func (s *AlgoOrderPlacementService) Price(price float64) *AlgoOrderPlacementService {
+	s.price = &price
+	return s
+}
+
+func (s *AlgoOrderPlacementService) TriggerPrice(triggerPrice float64) *AlgoOrderPlacementService {
+	s.triggerPrice = &triggerPrice
+	return s
+}
+
+func (s *AlgoOrderPlacementService) WorkingType(workingType WorkingType) *AlgoOrderPlacementService {
+	s.workingType = &workingType
+	return s
+}
+
+func (s *AlgoOrderPlacementService) PriceMatch(priceMatch string) *AlgoOrderPlacementService {
+	s.priceMatch = &priceMatch
+	return s
+}
+
+func (s *AlgoOrderPlacementService) ClosePosition(closePosition bool) *AlgoOrderPlacementService {
+	s.closePosition = &closePosition
+	return s
+}
+
+func (s *AlgoOrderPlacementService) PriceProtect(priceProtect string) *AlgoOrderPlacementService {
+	s.priceProtect = &priceProtect
+	return s
+}
+
+func (s *AlgoOrderPlacementService) ReduceOnly(reduceOnly bool) *AlgoOrderPlacementService {
+	s.reduceOnly = &reduceOnly
+	return s
+}
+
+func (s *AlgoOrderPlacementService) ActivationPrice(activationPrice float64) *AlgoOrderPlacementService {
+	s.activationPrice = &activationPrice
+	return s
+}
+
+func (s *AlgoOrderPlacementService) CallbackRate(callbackRate float64) *AlgoOrderPlacementService {
+	s.callbackRate = &callbackRate
+	return s
+}
+
+func (s *AlgoOrderPlacementService) ClientAlgoID(clientAlgoID string) *AlgoOrderPlacementService {
+	s.clientAlgoID = &clientAlgoID
+	return s
+}
+
+func (s *AlgoOrderPlacementService) NewOrderRespType(newOrderRespType OrderRespType) *AlgoOrderPlacementService {
+	s.newOrderRespType = &newOrderRespType
+	return s
+}
+
+func (s *AlgoOrderPlacementService) STPMode(stpMode STPMode) *AlgoOrderPlacementService {
+	s.stpMode = &stpMode
+	return s
+}
+
+func (s *AlgoOrderPlacementService) GoodTillDate(goodTillDate int64) *AlgoOrderPlacementService {
+	s.goodTillDate = &goodTillDate
+	return s
+}
+
+func (s *AlgoOrderPlacementService) RecvWindow(recvWindow int64) *AlgoOrderPlacementService {
+	s.recvWindow = &recvWindow
+	return s
+}
+
+func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacementResponse, error) {
+	respType := ACK
+	parameters := map[string]string{
+		"algoType": s.algoType,
+		"symbol":   s.symbol,
+		"side":     s.side,
+		"type":     s.orderType,
+	}
+	if s.positionSide != nil {
+		parameters["positionSide"] = *s.positionSide
+	}
+	if s.timeInForce != nil {
+		parameters["timeInForce"] = *s.timeInForce
+	}
+	if s.price != nil {
+		parameters["price"] = Float64ToString(*s.price)
+	}
+	if s.quantity != nil {
+		parameters["quantity"] = Float64ToString(*s.quantity)
+	}
+	if s.triggerPrice != nil {
+		parameters["triggerPrice"] = Float64ToString(*s.triggerPrice)
+	}
+	if s.workingType != nil {
+		parameters["workingType"] = *s.workingType
+	}
+	if s.priceMatch != nil {
+		parameters["priceMatch"] = *s.priceMatch
+	}
+	if s.closePosition != nil {
+		parameters["closePosition"] = BoolToString(*s.closePosition)
+	}
+	if s.priceProtect != nil {
+		parameters["priceProtect"] = *s.priceProtect
+	}
+	if s.reduceOnly != nil {
+		parameters["reduceOnly"] = BoolToString(*s.reduceOnly)
+	}
+	if s.activationPrice != nil {
+		parameters["activationPrice"] = Float64ToString(*s.activationPrice)
+	}
+	if s.callbackRate != nil {
+		parameters["callbackRate"] = Float64ToString(*s.callbackRate)
+	}
+	if s.clientAlgoID != nil {
+		parameters["clientAlgoID"] = *s.clientAlgoID
+	}
+	if s.newOrderRespType != nil {
+		parameters["newOrderRespType"] = *s.newOrderRespType
+	} else {
+		parameters["newOrderRespType"] = respType
+	}
+	if s.stpMode != nil {
+		parameters["selfTradePreventionMode"] = *s.stpMode
+	}
+	if s.goodTillDate != nil {
+		parameters["goodTillDate"] = Int64ToString(*s.goodTillDate)
+	}
+	if s.recvWindow != nil {
+		parameters["recvWindow"] = Int64ToString(*s.recvWindow)
+	}
+
+	signedParams, err := s.websocketAPI.Sign(parameters)
+	if err != nil {
+		panic(err)
+	}
+
+	id := getUUID()
+
+	payload := map[string]interface{}{
+		"id":     id,
+		"method": "algoOrder.place",
+		"params": signedParams,
+	}
+
+	messageCh := make(chan []byte)
+	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
+
+	err2 := s.websocketAPI.SendMessage(payload)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	defer s.websocketAPI.ReqResponseMap.Delete(id)
+
+	select {
+	case response := <-messageCh:
+		var rsp AlgoOrderPlacementResponse
+		err = Unmarshal(response, &rsp)
+		if err != nil {
+			return nil, err
+		}
+		return &rsp, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+type AlgoOrderPlacementResponse struct {
+	ID         string                      `json:"id"`
+	Status     int                         `json:"status"`
+	Error      *WsAPIErrorResponse         `json:"error,omitempty"`
+	Result     *AlgoOrderPlacementResponse `json:"result"`
+	RateLimits []*WsAPIRateLimit           `json:"rateLimits,omitempty"`
+}
+
+type AlgoOrderPlacementResult struct {
+	AlgoID          int64        `json:"algoId"`
+	ClientAlgoID    string       `json:"clientAlgoId"`
+	AlgoType        string       `json:"algoType"`
+	OrderType       OrderType    `json:"orderType"`
+	Symbol          string       `json:"symbol"`
+	Side            Side         `json:"side"`
+	PositionSide    PositionSide `json:"positionSide"`
+	TimeInForce     TimeInForce  `json:"timeInForce"`
+	Quantity        string       `json:"quantity"`
+	AlgoStatus      string       `json:"algoStatus"`
+	TriggerPrice    string       `json:"triggerPrice"`
+	Price           string       `json:"price"`
+	IcebergQuantity string       `json:"icebergQuantity"`
+	STPMode         STPMode      `json:"selfTradePreventionMode"`
+	WorkingType     WorkingType  `json:"workingType"`
+	PriceMatch      string       `json:"priceMatch"`
+	ClosePosition   bool         `json:"closePosition"`
+	PriceProtect    bool         `json:"priceProtect"`
+	ReduceOnly      bool         `json:"reduceOnly"`
+	CreateTime      int64        `json:"createTime"`
+	UpdateTime      int64        `json:"updateTime"`
+	TriggerTime     int64        `json:"triggerTime"`
+	GoodTillDate    int64        `json:"goodTillDate"`
+}
+
+type AlgoOrderCancelService struct {
+	websocketAPI *WebsocketAPIClient
+	algoID       *int64
+	clientAlgoID *string
+	recvWindow   *int64
+}
+
+func (s *AlgoOrderCancelService) AlgoID(algoID int64) *AlgoOrderCancelService {
+	s.algoID = &algoID
+	return s
+}
+
+func (s *AlgoOrderCancelService) ClientAlgoID(clientAlgoID string) *AlgoOrderCancelService {
+	s.clientAlgoID = &clientAlgoID
+	return s
+}
+
+func (s *AlgoOrderCancelService) RecvWindow(recvWindow int64) *AlgoOrderCancelService {
+	s.recvWindow = &recvWindow
+	return s
+}
+
+func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementResponse, error) {
+	parameters := make(map[string]string, 0)
+	if s.algoID != nil {
+		parameters["algoid"] = Int64ToString(*s.algoID)
+	}
+	if s.clientAlgoID != nil {
+		parameters["clientalgoid"] = *s.clientAlgoID
+	}
+	if s.recvWindow != nil {
+		parameters["recvWindow"] = Int64ToString(*s.recvWindow)
+	}
+
+	signedParams, err := s.websocketAPI.Sign(parameters)
+	if err != nil {
+		panic(err)
+	}
+
+	id := getUUID()
+
+	payload := map[string]interface{}{
+		"id":     id,
+		"method": "order.cancel",
+		"params": signedParams,
+	}
+
+	messageCh := make(chan []byte)
+	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
+
+	err2 := s.websocketAPI.SendMessage(payload)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	defer s.websocketAPI.ReqResponseMap.Delete(id)
+
+	select {
+	case response := <-messageCh:
+		var rsp AlgoOrderPlacementResponse
+		err = Unmarshal(response, &rsp)
+		if err != nil {
+			return nil, err
+		}
+		return &rsp, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
 }
