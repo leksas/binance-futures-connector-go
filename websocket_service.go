@@ -788,6 +788,8 @@ func (c *WebsocketStreamClient) WsUserDataServe(listenKey string, handler WsUser
 			err = Unmarshal(message, &event.GridUpdate)
 		case ConditionalOrderTriggerReject:
 			err = Unmarshal(message, &event.OrderReject)
+		case AlgoUpdate:
+			err = Unmarshal(message, &event.AlgoUpdate)
 		}
 		if err != nil {
 			errHandler(err)
@@ -874,6 +876,7 @@ type WsUserDataEvent struct {
 	StrategyUpdate  WsStrategyEvent             `json:"strategyUpdate,omitempty"`
 	GridUpdate      WsGridEvent                 `json:"gridUpdate,omitempty"`
 	OrderReject     WsConditionOrderRejectEvent `json:"orderReject,omitempty"`
+	AlgoUpdate      WsAlgoUpdateEvent           `json:"algoUpdate,omitempty"`
 }
 
 type (
@@ -1076,5 +1079,41 @@ type (
 		Symbol  string `json:"s"` // 交易对
 		OrderId int64  `json:"i"` // 订单号
 		Reason  string `json:"r"`
+	}
+
+	// 条件订单交易更新推送 ALGO_UPDATE
+	WsAlgoUpdateEvent struct {
+		Event           UserDataEventType `json:"e"` // 事件类型
+		EventTime       int64             `json:"E"` // 事件时间
+		TransactionTime int64             `json:"T"` // 撮合时间
+		Order           WsAlgoWsOrder     `json:"o"`
+	}
+
+	WsAlgoWsOrder struct {
+		ClientAlgoID  string       `json:"caid"` // 客户端自定条件订单ID
+		AlgoID        int64        `json:"aid"`  // 条件单 Id
+		AlgoType      string       `json:"at"`   // 条件单类型
+		OrderType     OrderType    `json:"o"`    // 订单类型
+		Symbol        string       `json:"s"`    // 交易对
+		Side          Side         `json:"S"`    // 订单方向
+		PositionSide  PositionSide `json:"ps"`   // 持仓方向
+		TimeInForce   TimeInForce  `json:"f"`    // 有效方式
+		Quantity      string       `json:"q"`    // 订单数量
+		Status        OrderStatus  `json:"X"`    // 条件单状态
+		OrderID       int64        `json:"ai"`   // 触发后普通订单 id
+		AvgPrice      string       `json:"ap"`   // 触发后在撮合引擎中实际订单的平均成交价格，仅在订单被触发并进入撮合引擎时显示
+		FilledVolume  string       `json:"aq"`   // 触发后在撮合引擎中实际订单已成交数量，仅当订单被触发并进入撮合引擎时显示
+		ActualType    string       `json:"act"`  // 触发后在撮合引擎中实际的订单类型，仅当订单被触发并进入撮合引擎时显示
+		TriggerPrice  string       `json:"tp"`   // 条件单触发价格
+		Price         string       `json:"p"`    // 订单价格
+		STPMode       STPMode      `json:"V"`    // 自成交防止模式
+		WorkingType   WorkingType  `json:"wt"`   // 触发价类型
+		PriceMatch    PriceMatch   `json:"pm"`   // 价格匹配模式
+		ClosePosition bool         `json:"cp"`   // 是否平仓
+		PriceProtect  bool         `json:"pP"`   // 是否开启条件单触发保护
+		ReduceOnly    bool         `json:"r"`    // 是否是只减仓单
+		TriggerTime   int64        `json:"tt"`   // 触发时间
+		GoodTillDate  int64        `json:"gtd"`  // TIF为GTD的订单自动取消时间
+		RejectReason  string       `json:"rm"`   // 条件单失败原因
 	}
 )

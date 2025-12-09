@@ -462,8 +462,6 @@ func parseUserDataJsonRsp(message []byte) (*UserDataEvent, error) {
 				// WorkingTime:   data.GetInt64("W"),
 			}
 			return &event, nil
-		case AlgoUpdate:
-			
 		default:
 			event.ExecutionReport = ExecutionReport{
 				Symbol:                  string(data.GetStringBytes("s")),

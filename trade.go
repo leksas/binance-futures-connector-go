@@ -2297,6 +2297,7 @@ type NewOpenAlgoOrdersResponse struct {
 	AlgoID          int64        `json:"algoId"`
 	ClientAlgoID    string       `json:"clientAlgoId"`
 	AlgoType        AlgoType     `json:"algoType"`
+	Symbol          string       `json:"symbol"`
 	OrderType       OrderType    `json:"orderType"`
 	Side            Side         `json:"side"`
 	PositionSide    PositionSide `json:"positionSide"`
@@ -2306,6 +2307,7 @@ type NewOpenAlgoOrdersResponse struct {
 	ActualPrice     string       `json:"actualPrice"`
 	TriggerPrice    string       `json:"triggerPrice"`
 	Price           string       `json:"price"`
+	Quantity        string       `json:"quantity"`
 	IcebergQuantity string       `json:"icebergQuantity"`
 	TpTriggerPrice  string       `json:"tpTriggerPrice"`
 	TpPrice         string       `json:"tpPrice"`
