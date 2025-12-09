@@ -658,3 +658,39 @@ func (c *Client) NewSetLeverageService() *SetLeverageService {
 func (c *Client) NewSetMultiAssetMarginService() *SetMultiAssetMarginService {
 	return &SetMultiAssetMarginService{c: c}
 }
+
+// ---------------------------ALGO Trade API---------------------------
+// Binance Create Algo Order (POST /fapi/v1/algoOrder)
+// 下条件单
+func (c *Client) NewCreateAlgoOrderService() *CreateAlgoOrderService {
+	return &CreateAlgoOrderService{c: c}
+}
+
+// Binance Cancel Algo Order (DELETE /fapi/v1/algoOrder)
+// 撤销条件单
+func (c *Client) NewCancelAlgoOrderService() *CancelAlgoOrderService {
+	return &CancelAlgoOrderService{c: c}
+}
+
+// Binance Cancel All Algo Orders (DELETE /fapi/v1/allAlgoOrders)
+func (c *Client) NewCancelAllAlgoOrdersService() *CancelAllOpenAlgoOrdersService {
+	return &CancelAllOpenAlgoOrdersService{c: c}
+}
+
+// Binance Get Algo Order (GET /fapi/v1/algoOrder)
+// 查询条件单
+func (c *Client) NewGetAlgoOrderService() *GetAlgoOrderService {
+	return &GetAlgoOrderService{c: c}
+}
+
+// Binance Get Open Algo Orders (GET /fapi/v1/openAlgoOrders)
+// 查看当前全部条件挂单
+func (c *Client) NewGetOpenAlgoOrdersService() *GetOpenAlgoOrdersService {
+	return &GetOpenAlgoOrdersService{c: c}
+}
+
+// Binance Get All Algo Orders (GET /fapi/v1/allAlgoOrders)
+// 查询所有条件订单
+func (c *Client) NewGetAllAlgoOrdersService() *GetAllAlgoOrdersService {
+	return &GetAllAlgoOrdersService{c: c}
+}

@@ -609,29 +609,29 @@ type OrderAmendentResponse struct {
 }
 
 // TODO: Cancel Order 撤销订单 (DELETE /fapi/v1/order)
-type CancelOrder struct {
+type CancelOrderService struct {
 	c                 *Client
 	symbol            string
 	orderId           *int64
 	origClientOrderId *string
 }
 
-func (s *CancelOrder) Symbol(symbol string) *CancelOrder {
+func (s *CancelOrderService) Symbol(symbol string) *CancelOrderService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *CancelOrder) OrderId(orderId int64) *CancelOrder {
+func (s *CancelOrderService) OrderId(orderId int64) *CancelOrderService {
 	s.orderId = &orderId
 	return s
 }
 
-func (s *CancelOrder) OrigClientOrderId(origClientOrderId string) *CancelOrder {
+func (s *CancelOrderService) OrigClientOrderId(origClientOrderId string) *CancelOrderService {
 	s.origClientOrderId = &origClientOrderId
 	return s
 }
 
-func (s *CancelOrder) Do(ctx context.Context, opts ...RequestOption) (res *NewOpenOrdersResponse, err error) {
+func (s *CancelOrderService) Do(ctx context.Context, opts ...RequestOption) (res *NewOpenOrdersResponse, err error) {
 	r := &request{
 		method:   http.MethodDelete,
 		endpoint: "/fapi/v1/order",
@@ -686,6 +686,7 @@ func (s *CancelAllOpenOrdersService) Do(ctx context.Context, opts ...RequestOpti
 		"symbol": s.symbol,
 	}
 	r.setParams(m)
+
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
 		return nil, err
@@ -1860,4 +1861,574 @@ func (s *OrderTestService) Do(ctx context.Context, opts ...RequestOption) (res i
 		return nil, err
 	}
 	return res, nil
+}
+
+// Binance New Algo Order endpoint (POST /fapi/v1/algoOrder)
+// CreateAlgoOrderService create order
+type CreateAlgoOrderService struct {
+	c                *Client
+	algoType         AlgoType
+	symbol           string
+	side             Side
+	positionSide     *PositionSide
+	orderType        OrderType
+	reduceOnly       *string
+	quantity         *float64
+	price            *float64
+	clientAlgoID     *string
+	triggerPrice     *float64
+	closePosition    *string
+	activationPrice  *float64
+	callbackRate     *float64
+	timeInForce      *TimeInForce
+	workingType      *WorkingType
+	priceProtect     *string
+	newOrderRespType *OrderRespType
+	priceMatch       *PriceMatch
+	stpMode          *STPMode
+	goodTillDate     *int64
+}
+
+func (s *CreateAlgoOrderService) AlgoType(algoType AlgoType) *CreateAlgoOrderService {
+	s.algoType = algoType
+	return s
+}
+
+func (s *CreateAlgoOrderService) Symbol(symbol string) *CreateAlgoOrderService {
+	s.symbol = symbol
+	return s
+}
+
+func (s *CreateAlgoOrderService) Side(side Side) *CreateAlgoOrderService {
+	s.side = side
+	return s
+}
+
+func (s *CreateAlgoOrderService) PositionSide(positionSide PositionSide) *CreateAlgoOrderService {
+	s.positionSide = &positionSide
+	return s
+}
+
+func (s *CreateAlgoOrderService) OrderType(orderType OrderType) *CreateAlgoOrderService {
+	s.orderType = orderType
+	return s
+}
+
+func (s *CreateAlgoOrderService) ReduceOnly(reduceOnly string) *CreateAlgoOrderService {
+	s.reduceOnly = &reduceOnly
+	return s
+}
+
+func (s *CreateAlgoOrderService) Quantity(quantity float64) *CreateAlgoOrderService {
+	s.quantity = &quantity
+	return s
+}
+
+func (s *CreateAlgoOrderService) Price(price float64) *CreateAlgoOrderService {
+	s.price = &price
+	return s
+}
+
+func (s *CreateAlgoOrderService) ClientAlgoID(clientAlgoID string) *CreateAlgoOrderService {
+	s.clientAlgoID = &clientAlgoID
+	return s
+}
+
+func (s *CreateAlgoOrderService) TriggerPrice(triggerPrice float64) *CreateAlgoOrderService {
+	s.triggerPrice = &triggerPrice
+	return s
+}
+
+func (s *CreateAlgoOrderService) ClosePosition(closePosition string) *CreateAlgoOrderService {
+	s.closePosition = &closePosition
+	return s
+}
+
+func (s *CreateAlgoOrderService) ActivationPrice(activationPrice float64) *CreateAlgoOrderService {
+	s.activationPrice = &activationPrice
+	return s
+}
+
+func (s *CreateAlgoOrderService) CallbackRate(callbackRate float64) *CreateAlgoOrderService {
+	s.callbackRate = &callbackRate
+	return s
+}
+
+func (s *CreateAlgoOrderService) TimeInForce(timeInForce TimeInForce) *CreateAlgoOrderService {
+	s.timeInForce = &timeInForce
+	return s
+}
+
+func (s *CreateAlgoOrderService) WorkingType(workingType WorkingType) *CreateAlgoOrderService {
+	s.workingType = &workingType
+	return s
+}
+
+func (s *CreateAlgoOrderService) PriceProtect(priceProtect string) *CreateAlgoOrderService {
+	s.priceProtect = &priceProtect
+	return s
+}
+
+func (s *CreateAlgoOrderService) NewOrderRespType(newOrderRespType OrderRespType) *CreateAlgoOrderService {
+	s.newOrderRespType = &newOrderRespType
+	return s
+}
+
+func (s *CreateAlgoOrderService) PriceMatch(priceMatch PriceMatch) *CreateAlgoOrderService {
+	s.priceMatch = &priceMatch
+	return s
+}
+
+func (s *CreateAlgoOrderService) STPMode(stpMode STPMode) *CreateAlgoOrderService {
+	s.stpMode = &stpMode
+	return s
+}
+
+func (s *CreateAlgoOrderService) GoodTillDate(goodTillDate int64) *CreateAlgoOrderService {
+	s.goodTillDate = &goodTillDate
+	return s
+}
+
+func (s *CreateAlgoOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateAlgoOrderResponse, err error) {
+	respType := ACK
+	r := &request{
+		method:   http.MethodPost,
+		endpoint: "/fapi/v1/algoOrder",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"algoType": s.algoType,
+		"symbol":   s.symbol,
+		"side":     s.side,
+		"type":     s.orderType,
+	}
+	if s.positionSide != nil {
+		m["positionSide"] = *s.positionSide
+	}
+	if s.reduceOnly != nil {
+		m["reduceOnly"] = *s.reduceOnly
+	}
+	if s.quantity != nil {
+		m["quantity"] = *s.quantity
+	}
+	if s.price != nil {
+		m["price"] = *s.price
+	}
+	if s.clientAlgoID != nil {
+		m["clientAlgoId"] = *s.clientAlgoID
+	}
+	if s.triggerPrice != nil {
+		m["triggerPrice"] = *s.triggerPrice
+	}
+	if s.closePosition != nil {
+		m["closePosition"] = *s.closePosition
+	}
+	if s.activationPrice != nil {
+		m["activationPrice"] = *s.activationPrice
+	}
+	if s.callbackRate != nil {
+		m["callbackRate"] = *s.callbackRate
+	}
+	if s.timeInForce != nil {
+		m["timeInForce"] = *s.timeInForce
+	}
+	if s.workingType != nil {
+		m["workingType"] = *s.workingType
+	}
+	if s.priceProtect != nil {
+		m["priceProtect"] = *s.priceProtect
+	}
+	if s.newOrderRespType != nil {
+		m["newOrderRespType"] = *s.newOrderRespType
+	} else {
+		m["newOrderRespType"] = respType
+	}
+	if s.priceMatch != nil {
+		m["priceMatch"] = *s.priceMatch
+	}
+	if s.stpMode != nil {
+		m["selfTradePreventionMode"] = *s.stpMode
+	}
+	if s.goodTillDate != nil {
+		m["goodTillDate"] = *s.goodTillDate
+	}
+	r.setParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(CreateAlgoOrderResponse)
+	err = Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+}
+
+type CreateAlgoOrderResponse struct {
+	AlgoID          int64        `json:"algoId"`
+	ClientAlgoID    string       `json:"clientAlgoId"`
+	AlgoType        AlgoType     `json:"algoType"`
+	Side            Side         `json:"side"`
+	PositionSide    PositionSide `json:"positionSide"`
+	OrderType       OrderType    `json:"orderType"`
+	Symbol          string       `json:"symbol"`
+	TimeInForce     TimeInForce  `json:"timeInForce"`
+	Quantity        string       `json:"quantity"`
+	AlgoStatus      OrderStatus  `json:"algoStatus"`
+	TriggerPrice    string       `json:"triggerPrice"`
+	Price           string       `json:"price"`
+	IcebergQuantity string       `json:"icebergQuantity"`
+	STPMode         STPMode      `json:"selfTradePreventionMode"`
+	WorkingType     WorkingType  `json:"workingType"`
+	PriceMatch      PriceMatch   `json:"priceMatch"`
+	ClosePosition   bool         `json:"closePosition"`
+	ReduceOnly      bool         `json:"reduceOnly"`
+	ActivatePrice   string       `json:"activatePrice"`
+	CallbackRate    string       `json:"callbackRate"`
+	CreateTime      int64        `json:"createTime"`
+	UpdateTime      int64        `json:"updateTime"`
+	TriggerTime     int64        `json:"triggerTime"`
+	GoodTillDate    int64        `json:"goodTillDate"`
+}
+
+// Binance Cancel Algo Order Service (DELETE /fapi/v1/algoOrder)
+type CancelAlgoOrderService struct {
+	c            *Client
+	algoID       *int64
+	clientAlgoID *string
+}
+
+func (s *CancelAlgoOrderService) AlgoID(algoID int64) *CancelAlgoOrderService {
+	s.algoID = &algoID
+	return s
+}
+
+func (s *CancelAlgoOrderService) ClientAlgoID(clientAlgoID string) *CancelAlgoOrderService {
+	s.clientAlgoID = &clientAlgoID
+	return s
+}
+
+func (s *CancelAlgoOrderService) Do(ctx context.Context, opts ...RequestOption) (res *NewOpenAlgoOrdersResponse, err error) {
+	r := &request{
+		method:   http.MethodDelete,
+		endpoint: "/fapi/v1/algoOrder",
+		secType:  secTypeSigned,
+	}
+	m := params{}
+	if s.algoID != nil {
+		m["algoId"] = *s.algoID
+	}
+	if s.clientAlgoID != nil {
+		m["clientAlgoId"] = *s.clientAlgoID
+	}
+	r.setParams(m)
+
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(NewOpenAlgoOrdersResponse)
+	err = Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// Binance Cancel All Open Algo Orders endpoint (DELETE /fapi/v1/algoOpenOrders)
+type CancelAllOpenAlgoOrdersService struct {
+	c      *Client
+	symbol string
+}
+
+func (s *CancelAllOpenAlgoOrdersService) Symbol(symbol string) *CancelAllOpenAlgoOrdersService {
+	s.symbol = symbol
+	return s
+}
+
+func (s *CancelAllOpenAlgoOrdersService) Do(ctx context.Context, opts ...RequestOption) (res *CancelAllAlgoOrderResponse, err error) {
+	r := &request{
+		method:   http.MethodDelete,
+		endpoint: "/fapi/v1/algoOpenOrders",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"symbol": s.symbol,
+	}
+	r.setParams(m)
+
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(CancelAllAlgoOrderResponse)
+	err = Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type CancelAllAlgoOrderResponse struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
+
+// Binance Get Algo Order endpoint (GET /fapi/v1/algoOrder)
+type GetAlgoOrderService struct {
+	c            *Client
+	algoID       *int64
+	clientAlgoID *string
+}
+
+func (s *GetAlgoOrderService) AlgoID(algoID int64) *GetAlgoOrderService {
+	s.algoID = &algoID
+	return s
+}
+
+func (s *GetAlgoOrderService) ClientAlgoID(clientAlgoID string) *GetAlgoOrderService {
+	s.clientAlgoID = &clientAlgoID
+	return s
+}
+
+func (s *GetAlgoOrderService) Do(ctx context.Context, opts ...RequestOption) (res *GetAlgoOrderResponse, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/algoOrder",
+		secType:  secTypeSigned,
+	}
+	m := params{}
+	if s.algoID != nil {
+		m["algoId"] = *s.algoID
+	}
+	if s.clientAlgoID != nil {
+		m["clientAlgoId"] = *s.clientAlgoID
+	}
+	r.setParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(GetAlgoOrderResponse)
+	err = Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type GetAlgoOrderResponse struct {
+	AlgoID          int64        `json:"algoId"`
+	ClientAlgoID    string       `json:"clientAlgoId"`
+	AlgoType        AlgoType     `json:"algoType"`
+	OrderType       OrderType    `json:"orderType"`
+	Side            Side         `json:"side"`
+	PositionSide    PositionSide `json:"positionSide"`
+	TimeInForce     TimeInForce  `json:"timeInForce"`
+	AlgoStatus      OrderStatus  `json:"algoStatus"`
+	ActualOrderID   string       `json:"actualOrderId"`
+	ActualPrice     string       `json:"actualPrice"`
+	TriggerPrice    string       `json:"triggerPrice"`
+	Price           string       `json:"price"`
+	IcebergQuantity string       `json:"icebergQuantity"`
+	TpTriggerPrice  string       `json:"tpTriggerPrice"`
+	TpPrice         string       `json:"tpPrice"`
+	SlTriggerPrice  string       `json:"slTriggerPrice"`
+	SlPrice         string       `json:"slPrice"`
+	TpOrderType     string       `json:"tpOrderType"`
+	STPMode         STPMode      `json:"selfTradePreventionMode"`
+	WorkingType     WorkingType  `json:"workingType"`
+	PriceMatch      PriceMatch   `json:"priceMatch"`
+	ClosePosition   bool         `json:"closePosition"`
+	PriceProtect    bool         `json:"priceProtect"`
+	ReduceOnly      bool         `json:"reduceOnly"`
+	CreateTime      int64        `json:"createTime"`
+	UpdateTime      int64        `json:"updateTime"`
+	TriggerTime     int64        `json:"triggerTime"`
+	GoodTillDate    int64        `json:"goodTillDate"`
+}
+
+// Binance Get Open Algo Orders endpoint (GET /fapi/v1/openAlgoOrders)
+type GetOpenAlgoOrdersService struct {
+	c        *Client
+	algoType *AlgoType
+	symbol   *string
+	algoID   *int64
+}
+
+func (s *GetOpenAlgoOrdersService) AlgoType(algoType AlgoType) *GetOpenAlgoOrdersService {
+	s.algoType = &algoType
+	return s
+}
+
+func (s *GetOpenAlgoOrdersService) Symbol(symbol string) *GetOpenAlgoOrdersService {
+	s.symbol = &symbol
+	return s
+}
+
+func (s *GetOpenAlgoOrdersService) AlgoID(algoID int64) *GetOpenAlgoOrdersService {
+	s.algoID = &algoID
+	return s
+}
+
+func (s *GetOpenAlgoOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*NewOpenAlgoOrdersResponse, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/openAlgoOrders",
+		secType:  secTypeSigned,
+	}
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = make([]*NewOpenAlgoOrdersResponse, 0)
+	err = Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type NewOpenAlgoOrdersResponse struct {
+	AlgoID          int64        `json:"algoId"`
+	ClientAlgoID    string       `json:"clientAlgoId"`
+	AlgoType        AlgoType     `json:"algoType"`
+	OrderType       OrderType    `json:"orderType"`
+	Side            Side         `json:"side"`
+	PositionSide    PositionSide `json:"positionSide"`
+	TimeInForce     TimeInForce  `json:"timeInForce"`
+	AlgoStatus      OrderStatus  `json:"algoStatus"`
+	ActualOrderID   string       `json:"actualOrderId"`
+	ActualPrice     string       `json:"actualPrice"`
+	TriggerPrice    string       `json:"triggerPrice"`
+	Price           string       `json:"price"`
+	IcebergQuantity string       `json:"icebergQuantity"`
+	TpTriggerPrice  string       `json:"tpTriggerPrice"`
+	TpPrice         string       `json:"tpPrice"`
+	SlTriggerPrice  string       `json:"slTriggerPrice"`
+	SlPrice         string       `json:"slPrice"`
+	TpOrderType     string       `json:"tpOrderType"`
+	STPMode         STPMode      `json:"selfTradePreventionMode"`
+	WorkingType     WorkingType  `json:"workingType"`
+	PriceMatch      PriceMatch   `json:"priceMatch"`
+	ClosePosition   bool         `json:"closePosition"`
+	PriceProtect    bool         `json:"priceProtect"`
+	ReduceOnly      bool         `json:"reduceOnly"`
+	CreateTime      int64        `json:"createTime"`
+	UpdateTime      int64        `json:"updateTime"`
+	TriggerTime     int64        `json:"triggerTime"`
+	GoodTillDate    int64        `json:"goodTillDate"`
+}
+
+// Binance Get All Algo Orders endpoint (GET /fapi/v1/allAlgoOrders)
+type GetAllAlgoOrdersService struct {
+	c         *Client
+	symbol    string
+	algoID    *int64
+	startTime *int64
+	endTime   *int64
+	page      *int
+	limit     *int
+}
+
+func (s *GetAllAlgoOrdersService) Symbol(symbol string) *GetAllAlgoOrdersService {
+	s.symbol = symbol
+	return s
+}
+
+func (s *GetAllAlgoOrdersService) AlgoID(algoID int64) *GetAllAlgoOrdersService {
+	s.algoID = &algoID
+	return s
+}
+
+func (s *GetAllAlgoOrdersService) StartTime(startTime int64) *GetAllAlgoOrdersService {
+	s.startTime = &startTime
+	return s
+}
+
+func (s *GetAllAlgoOrdersService) EndTime(endTime int64) *GetAllAlgoOrdersService {
+	s.endTime = &endTime
+	return s
+}
+
+func (s *GetAllAlgoOrdersService) Page(page int) *GetAllAlgoOrdersService {
+	s.page = &page
+	return s
+}
+
+func (s *GetAllAlgoOrdersService) Limit(limit int) *GetAllAlgoOrdersService {
+	s.limit = &limit
+	return s
+}
+
+func (s *GetAllAlgoOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*NewAllAlgoOrdersResponse, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/allAlgoOrders",
+		secType:  secTypeSigned,
+	}
+	m := params{
+		"symbol": s.symbol,
+	}
+	if s.algoID != nil {
+		m["algoId"] = *s.algoID
+	}
+	if s.startTime != nil {
+		m["startTime"] = *s.startTime
+	}
+	if s.endTime != nil {
+		m["endTime"] = *s.endTime
+	}
+	if s.page != nil {
+		m["page"] = *s.page
+	}
+	if s.limit != nil {
+		m["limit"] = *s.limit
+	}
+	r.setParams(m)
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = make([]*NewAllAlgoOrdersResponse, 0)
+	err = Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type NewAllAlgoOrdersResponse struct {
+	AlgoID          int64        `json:"algoId"`
+	ClientAlgoID    string       `json:"clientAlgoId"`
+	AlgoType        AlgoType     `json:"algoType"`
+	OrderType       OrderType    `json:"orderType"`
+	Side            Side         `json:"side"`
+	PositionSide    PositionSide `json:"positionSide"`
+	TimeInForce     TimeInForce  `json:"timeInForce"`
+	AlgoStatus      OrderStatus  `json:"algoStatus"`
+	ActualOrderID   string       `json:"actualOrderId"`
+	ActualPrice     string       `json:"actualPrice"`
+	TriggerPrice    string       `json:"triggerPrice"`
+	Price           string       `json:"price"`
+	IcebergQuantity string       `json:"icebergQuantity"`
+	TpTriggerPrice  string       `json:"tpTriggerPrice"`
+	TpPrice         string       `json:"tpPrice"`
+	SlTriggerPrice  string       `json:"slTriggerPrice"`
+	SlPrice         string       `json:"slPrice"`
+	TpOrderType     string       `json:"tpOrderType"`
+	STPMode         STPMode      `json:"selfTradePreventionMode"`
+	WorkingType     WorkingType  `json:"workingType"`
+	PriceMatch      PriceMatch   `json:"priceMatch"`
+	ClosePosition   bool         `json:"closePosition"`
+	PriceProtect    bool         `json:"priceProtect"`
+	ReduceOnly      bool         `json:"reduceOnly"`
+	CreateTime      int64        `json:"createTime"`
+	UpdateTime      int64        `json:"updateTime"`
+	TriggerTime     int64        `json:"triggerTime"`
+	GoodTillDate    int64        `json:"goodTillDate"`
 }

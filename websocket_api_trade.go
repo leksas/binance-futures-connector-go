@@ -995,7 +995,7 @@ func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementRes
 
 	payload := map[string]interface{}{
 		"id":     id,
-		"method": "order.cancel",
+		"method": "algoOrder.cancel",
 		"params": signedParams,
 	}
 
