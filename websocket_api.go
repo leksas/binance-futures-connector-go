@@ -688,11 +688,11 @@ func (w *WebsocketAPIClient) NewAccountPositionService() *AccountPositionService
 	return &AccountPositionService{websocketAPI: w}
 }
 
-func (w *WebsocketAPIClient) NewAlgoOrderPlacementService() *AlgoOrderPlacementService {
+func (w *WebsocketAPIClient) NewPlaceAlgoOrderService() *AlgoOrderPlacementService {
 	return &AlgoOrderPlacementService{websocketAPI: w}
 }
 
-func (w *WebsocketAPIClient) NewAlgoOrderCancelService() *AlgoOrderCancelService {
+func (w *WebsocketAPIClient) NewCancelAlgoOrderService() *AlgoOrderCancelService {
 	return &AlgoOrderCancelService{websocketAPI: w}
 }
 
