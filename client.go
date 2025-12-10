@@ -583,7 +583,7 @@ func (c *Client) NewCreateOrderService() *CreateOrderService {
 
 // Binance Cancel All Open Orders (DELETE /fapi/v1/allOpenOrders)
 // 撤销全部订单
-func (c *Client) NewCancelOpenOrdersService() *CancelAllOpenOrdersService {
+func (c *Client) NewCancelAllOpenOrdersService() *CancelAllOpenOrdersService {
 	return &CancelAllOpenOrdersService{c: c}
 }
 
@@ -672,9 +672,9 @@ func (c *Client) NewCancelAlgoOrderService() *CancelAlgoOrderService {
 	return &CancelAlgoOrderService{c: c}
 }
 
-// Binance Cancel All Algo Orders (DELETE /fapi/v1/allAlgoOrders)
-func (c *Client) NewCancelAllAlgoOrdersService() *CancelAllOpenAlgoOrdersService {
-	return &CancelAllOpenAlgoOrdersService{c: c}
+// Binance Cancel Algo Open Orders (DELETE /fapi/v1/algoOpenOrders)
+func (c *Client) NewCancelAlgoOpenOrdersService() *CancelAlgoOpenOrdersService {
+	return &CancelAlgoOpenOrdersService{c: c}
 }
 
 // Binance Get Algo Order (GET /fapi/v1/algoOrder)

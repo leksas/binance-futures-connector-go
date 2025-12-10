@@ -2136,18 +2136,18 @@ func (s *CancelAlgoOrderService) Do(ctx context.Context, opts ...RequestOption) 
 	return res, nil
 }
 
-// Binance Cancel All Open Algo Orders endpoint (DELETE /fapi/v1/algoOpenOrders)
-type CancelAllOpenAlgoOrdersService struct {
+// Binance Cancel Algo Open Orders endpoint (DELETE /fapi/v1/algoOpenOrders)
+type CancelAlgoOpenOrdersService struct {
 	c      *Client
 	symbol string
 }
 
-func (s *CancelAllOpenAlgoOrdersService) Symbol(symbol string) *CancelAllOpenAlgoOrdersService {
+func (s *CancelAlgoOpenOrdersService) Symbol(symbol string) *CancelAlgoOpenOrdersService {
 	s.symbol = symbol
 	return s
 }
 
-func (s *CancelAllOpenAlgoOrdersService) Do(ctx context.Context, opts ...RequestOption) (res *CancelAllAlgoOrderResponse, err error) {
+func (s *CancelAlgoOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res *CancelAlgoOpenOrderResponse, err error) {
 	r := &request{
 		method:   http.MethodDelete,
 		endpoint: "/fapi/v1/algoOpenOrders",
@@ -2162,7 +2162,7 @@ func (s *CancelAllOpenAlgoOrdersService) Do(ctx context.Context, opts ...Request
 	if err != nil {
 		return nil, err
 	}
-	res = new(CancelAllAlgoOrderResponse)
+	res = new(CancelAlgoOpenOrderResponse)
 	err = Unmarshal(data, res)
 	if err != nil {
 		return nil, err
@@ -2170,7 +2170,7 @@ func (s *CancelAllOpenAlgoOrdersService) Do(ctx context.Context, opts ...Request
 	return res, nil
 }
 
-type CancelAllAlgoOrderResponse struct {
+type CancelAlgoOpenOrderResponse struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 }
