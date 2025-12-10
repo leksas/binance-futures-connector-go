@@ -201,3 +201,86 @@ type SymbolConfig struct {
 	Leverage         int    `json:"leverage"`
 	MaxNotionalValue string `json:"maxNotionalValue"`
 }
+
+type GetIncomeService struct {
+	c          *Client
+	symbol     *string
+	incomeType *string
+	startTime  *int64
+	endTime    *int64
+	page       *int
+	limit      *int
+}
+
+func (s *GetIncomeService) Symbol(symbol string) *GetIncomeService {
+	s.symbol = &symbol
+	return s
+}
+
+func (s *GetIncomeService) IncomeType(incomeType string) *GetIncomeService {
+	s.incomeType = &incomeType
+	return s
+}
+
+func (s *GetIncomeService) StartTime(startTime int64) *GetIncomeService {
+	s.startTime = &startTime
+	return s
+}
+
+func (s *GetIncomeService) EndTime(endTime int64) *GetIncomeService {
+	s.endTime = &endTime
+	return s
+}
+
+func (s *GetIncomeService) Page(page int) *GetIncomeService {
+	s.page = &page
+	return s
+}
+
+func (s *GetIncomeService) Limit(limit int) *GetIncomeService {
+	s.limit = &limit
+	return s
+}
+
+func (s *GetIncomeService) Do(ctx context.Context, opts ...RequestOption) (res []Income, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/income",
+		secType:  secTypeSigned,
+	}
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+	if s.incomeType != nil {
+		r.setParam("incomeType", *s.incomeType)
+	}
+	if s.startTime != nil {
+		r.setParam("startTime", *s.startTime)
+	}
+	if s.endTime != nil {
+		r.setParam("endTime", *s.endTime)
+	}
+	if s.page != nil {
+		r.setParam("page", *s.page)
+	}
+	if s.limit != nil {
+		r.setParam("limit", *s.limit)
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return []Income{}, err
+	}
+	err = Unmarshal(data, &res)
+	return res, err
+}
+
+type Income struct {
+	Symbol     string     `json:"symbol"`
+	IncomeType IncomeType `json:"incomeType"`
+	Income     string     `json:"income"`
+	Asset      string     `json:"asset"`
+	Info       string     `json:"info"`
+	Time       int64      `json:"time"`
+	TranID     int64      `json:"tranId"`
+	TradeID    string     `json:"tradeId"`
+}

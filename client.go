@@ -694,3 +694,9 @@ func (c *Client) NewGetOpenAlgoOrdersService() *GetOpenAlgoOrdersService {
 func (c *Client) NewGetAllAlgoOrdersService() *GetAllAlgoOrdersService {
 	return &GetAllAlgoOrdersService{c: c}
 }
+
+// Binance Get Income (GET /fapi/v1/income)
+// 获取账户损益资金流水
+func (c *Client) NewGetIncomeService() *GetIncomeService {
+	return &GetIncomeService{c: c}
+}

@@ -50,17 +50,10 @@ var (
 	WebsocketKeepalive = true
 )
 
-// WsPartialDepthEvent define websocket partial depth book event
-type WsPartialDepthEvent struct {
-	Event           string `json:"e"`
-	EventTime       int64  `json:"E"`
-	TransactionTime int64  `json:"T"`
-	Symbol          string `json:"s"`
-	FirstUpdateID   int64  `json:"U"`
-	LastUpdateID    int64  `json:"u"`
-	PrevUpdateID    int64  `json:"pu"`
-	Bids            []Bid  `json:"b"`
-	Asks            []Ask  `json:"a"`
+
+type Depth struct {
+	Price    float64
+	Quantity float64
 }
 
 // WsPartialDepthHandler handle websocket partial depth event
@@ -82,52 +75,33 @@ func (c *WebsocketStreamClient) WsPartialDepthServe100Ms(symbol string, levels s
 func wsPartialDepthServe(endpoint string, handler WsPartialDepthHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
 	cfg := newWsConfig(endpoint)
 	wsHandler := func(message []byte) {
-		j, err := newJSONv2(message)
+		event := new(WsPartialDepthEvent)
+		err = Unmarshal(message, event)
 		if err != nil {
 			errHandler(err)
 			return
 		}
-		event := new(WsPartialDepthEvent)
 
-		// 解析stream字段
-		stream := string(j.GetStringBytes("stream"))
-		symbol := strings.Split(stream, "@")[0]
-		event.Symbol = strings.ToUpper(symbol)
-
-		// 解析data字段
-		data := j.Get("data")
-		event.Event = string(data.GetStringBytes("e"))
-		event.EventTime = data.GetInt64("E")
-		event.TransactionTime = data.GetInt64("T")
-		event.FirstUpdateID = data.GetInt64("U")
-		event.LastUpdateID = data.GetInt64("u")
-		event.PrevUpdateID = data.GetInt64("pu")
-
-		bids := data.GetArray("b")
-		bidsLen := len(bids)
-		event.Bids = make([]Bid, bidsLen)
-
-		for i := 0; i < bidsLen; i++ {
-			item, _ := bids[i].Array()
-			event.Bids[i] = Bid{
-				Price:    string(item[0].GetStringBytes()),
-				Quantity: string(item[1].GetStringBytes()),
-			}
-		}
-
-		asks := data.GetArray("a")
-		asksLen := len(asks)
-		event.Asks = make([]Ask, asksLen)
-		for i := 0; i < asksLen; i++ {
-			item, _ := asks[i].Array()
-			event.Asks[i] = Ask{
-				Price:    string(item[0].GetStringBytes()),
-				Quantity: string(item[1].GetStringBytes()),
-			}
-		}
 		handler(event)
 	}
 	return wsServe(cfg, wsHandler, errHandler)
+}
+
+type WsPartialDepthEvent struct {
+	Event         string     `json:"e"`  // 事件类型，这里是 "depthUpdate"
+	EventTime     int64      `json:"E"`  // 事件发生的时间戳（毫秒）
+	TradeTime     int64      `json:"T"`  // 交易时间戳（毫秒）
+	Symbol        string     `json:"s"`  // 交易对，如 "BNBUSDT"
+	FirstUpdateID int64      `json:"U"`  // 本次更新的第一个ID
+	LastUpdateID  int64      `json:"u"`  // 本次更新的最后一个ID
+	PrevLastID    int64      `json:"pu"` // 上一次更新的最后一个ID
+	Bids          [][]string `json:"b"`  // 买方挂单列表，格式为 [价格, 数量]
+	Asks          [][]string `json:"a"`  // 卖方挂单列表，格式为 [价格, 数量]
+}
+
+type WsCombinedPartialDepthEvent struct {
+	Data   *WsPartialDepthEvent `json:"data"`
+	Stream string               `json:"stream"`
 }
 
 // WsCombinedPartialDepthServe is similar to WsPartialDepthServe, but it for multiple symbols
@@ -139,50 +113,14 @@ func (c *WebsocketStreamClient) WsCombinedPartialDepthServe(symbolLevels map[str
 	endpoint = endpoint[:len(endpoint)-1]
 	cfg := newWsConfig(endpoint)
 	wsHandler := func(message []byte) {
-		j, err := newJSONv2(message)
+		event := new(WsCombinedPartialDepthEvent)
+		err = Unmarshal(message, event)
 		if err != nil {
 			errHandler(err)
 			return
 		}
-		event := new(WsPartialDepthEvent)
 
-		// 解析stream字段
-		stream := string(j.GetStringBytes("stream"))
-		symbol := strings.Split(stream, "@")[0]
-		event.Symbol = strings.ToUpper(symbol)
-
-		// 解析data字段
-		data := j.Get("data")
-		event.Event = string(data.GetStringBytes("e"))
-		event.EventTime = data.GetInt64("E")
-		event.TransactionTime = data.GetInt64("T")
-		event.FirstUpdateID = data.GetInt64("U")
-		event.LastUpdateID = data.GetInt64("u")
-		event.PrevUpdateID = data.GetInt64("pu")
-
-		bids := data.GetArray("b")
-		bidsLen := len(bids)
-		event.Bids = make([]Bid, bidsLen)
-
-		for i := 0; i < bidsLen; i++ {
-			item, _ := bids[i].Array()
-			event.Bids[i] = Bid{
-				Price:    string(item[0].GetStringBytes()),
-				Quantity: string(item[1].GetStringBytes()),
-			}
-		}
-
-		asks := data.GetArray("a")
-		asksLen := len(asks)
-		event.Asks = make([]Ask, asksLen)
-		for i := 0; i < asksLen; i++ {
-			item, _ := asks[i].Array()
-			event.Asks[i] = Ask{
-				Price:    string(item[0].GetStringBytes()),
-				Quantity: string(item[1].GetStringBytes()),
-			}
-		}
-		handler(event)
+		handler(event.Data)
 	}
 	return wsServe(cfg, wsHandler, errHandler)
 }
