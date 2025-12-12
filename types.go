@@ -85,6 +85,9 @@ var (
 	REJECTED         OrderStatus = "REJECTED"         // 订单被拒绝
 	EXPIRED          OrderStatus = "EXPIRED"          // 订单过期(根据timeInForce参数规则)
 	EXPIRED_IN_MATCH OrderStatus = "EXPIRED_IN_MATCH" // 订单被STP过期
+	TRIGGERING       OrderStatus = "TRIGGERING"       // 条件单被触发
+	TRIGGERED        OrderStatus = "TRIGGERED"        // 条件单触发完成
+	FINISHED         OrderStatus = "FINISHED"         // 条件单已完成
 
 	// Interval1m K线间隔
 	Interval1m  Interval = "1m"
