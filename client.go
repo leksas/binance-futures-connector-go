@@ -700,3 +700,9 @@ func (c *Client) NewGetAllAlgoOrdersService() *GetAllAlgoOrdersService {
 func (c *Client) NewGetIncomeService() *GetIncomeService {
 	return &GetIncomeService{c: c}
 }
+
+// Binance Get If New User (GET /fapi/v1/ifNewUser)
+// 查询是否属于新用户
+func (c *Client) NewIfNewUserService() *IfNewUserService {
+	return &IfNewUserService{c: c}
+}
