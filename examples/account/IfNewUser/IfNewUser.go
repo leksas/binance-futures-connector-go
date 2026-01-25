@@ -2,16 +2,11 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 
 	binance_connector "github.com/leksas/binance-futures-connector-go"
-)
-
-var (
-	APIKey     = ""
-	PrivateKey = ""
-	BrokerID   = ""
 )
 
 func main() {
@@ -19,9 +14,17 @@ func main() {
 }
 
 func IfNewUserExample() {
-	client, _ := binance_connector.NewEdClient(APIKey, PrivateKey, "https://fapi.binance.com")
+	var (
+		apiKey     = flag.String("apiKey", "", "ApiKey")
+		privateKey = flag.String("privateKey", "", "PrivateKey")
+		code       = flag.String("code", "", "Code")
+	)
 
-	response, err := client.NewIfNewUserService().BrokerID(BrokerID).Do(context.Background())
+	flag.Parse()
+
+	client, _ := binance_connector.NewEdClient(*apiKey, *privateKey, "https://fapi.binance.com")
+
+	response, err := client.NewIfNewUserService().BrokerID(*code).Do(context.Background())
 	if err != nil {
 		log.Printf("Error: %v", err)
 		return
