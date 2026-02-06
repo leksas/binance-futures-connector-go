@@ -706,3 +706,9 @@ func (c *Client) NewGetIncomeService() *GetIncomeService {
 func (c *Client) NewIfNewUserService() *IfNewUserService {
 	return &IfNewUserService{c: c}
 }
+
+// Binance Stock Contract (POST /fapi/v1/stock/contract)
+// 签署传统金融合约协议
+func (c *Client) NewStockContractService() *StockContractService {
+	return &StockContractService{c: c}
+}

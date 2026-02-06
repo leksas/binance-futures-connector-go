@@ -113,6 +113,7 @@ var (
 	CURRENT_QUARTER      ContractType = "CURRENT_QUARTER"      // 当季交割合约
 	NEXT_QUARTER         ContractType = "NEXT_QUARTER"         // 次季交割合约
 	PERPETUAL_DELIVERING ContractType = "PERPETUAL_DELIVERING" // 交割结算中合约
+	TRADIFI_PERPETUAL    ContractType = "TRADIFI_PERPETUAL"    // 传统金融合约
 
 	// ContractStatus 合约状态
 	PendingTrading ContractStatus = "PENDING_TRADING" // 待上市

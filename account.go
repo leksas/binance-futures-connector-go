@@ -284,3 +284,21 @@ type Income struct {
 	TranID     int64      `json:"tranId"`
 	TradeID    string     `json:"tradeId"`
 }
+
+type StockContractService struct {
+	c *Client
+}
+
+func (s *StockContractService) Do(ctx context.Context, opts ...RequestOption) error {
+	r := &request{
+		method:   "POST",
+		endpoint: "/fapi/v1/stock/contract",
+		secType:  secTypeSigned,
+	}
+
+	_, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
