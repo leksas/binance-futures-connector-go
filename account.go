@@ -302,3 +302,48 @@ func (s *StockContractService) Do(ctx context.Context, opts ...RequestOption) er
 	}
 	return nil
 }
+
+type LeverageBracketService struct {
+	c      *Client
+	symbol *string
+}
+
+func (s *LeverageBracketService) Symbol(symbol string) *LeverageBracketService {
+	s.symbol = &symbol
+	return s
+}
+
+func (s *LeverageBracketService) Do(ctx context.Context, opts ...RequestOption) (res []*SymbolLeverageBracket, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/leverageBracket",
+		secType:  secTypeSigned,
+	}
+
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = Unmarshal(data, &res)
+	return res, err
+}
+
+type SymbolLeverageBracket struct {
+	Symbol       string            `json:"symbol"`
+	NotionalCoef float64           `json:"notionalCoef"`
+	Brackets     []LeverageBracket `json:"brackets"`
+}
+
+type LeverageBracket struct {
+	Bracket         int     `json:"bracket"`
+	InitialLeverage int     `json:"initialLeverage"`
+	NotionalCap     float64 `json:"notionalCap"`
+	NotionalFloor   float64 `json:"notionalFloor"`
+	MaintainMargin  float64 `json:"maintainMargin"`
+	Cum             float64 `json:"cum"`
+}

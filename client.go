@@ -573,6 +573,11 @@ func (c *Client) NewGetSymbolConfigService() *SymbolConfigService {
 	return &SymbolConfigService{c: c}
 }
 
+// Binance Get Leverage Bracket (GET /fapi/v1/leverageBracket)
+func (c *Client) NewLeverageBracketService() *LeverageBracketService {
+	return &LeverageBracketService{c: c}
+}
+
 // ---------------------------Trade API---------------------------------
 
 // Binance Create Order (POST /fapi/v1/order)
