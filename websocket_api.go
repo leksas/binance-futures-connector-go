@@ -53,7 +53,7 @@ type WsAPIRateLimit struct {
 }
 
 type WsAPIErrorResponse struct {
-	Code    int    `json:"code"`
+	Code    int64  `json:"code"`
 	ID      string `json:"id"`
 	Message string `json:"msg"`
 }

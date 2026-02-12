@@ -3,6 +3,8 @@ package binance_futures_connector
 import (
 	"context"
 	"strconv"
+
+	"github.com/leksas/binance-futures-connector-go/handlers"
 )
 
 type OrderPlacementService struct {
@@ -236,12 +238,15 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 
 	select {
 	case response := <-messageCh:
-		var orderPlacementResponse OrderPlacementResponse
-		err = Unmarshal(response, &orderPlacementResponse)
+		var rsp OrderPlacementResponse
+		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
 		}
-		return &orderPlacementResponse, nil
+		if rsp.Status != SuccessCode {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+		}
+		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
@@ -387,12 +392,15 @@ func (s *OrderModifyService) Do(ctx context.Context) (*OrderPlacementResponse, e
 
 	select {
 	case response := <-messageCh:
-		var orderPlacementResponse OrderPlacementResponse
-		err = Unmarshal(response, &orderPlacementResponse)
+		var rsp OrderPlacementResponse
+		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
 		}
-		return &orderPlacementResponse, nil
+		if rsp.Status != SuccessCode {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+		}
+		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
@@ -465,12 +473,15 @@ func (s *OrderCancelService) Do(ctx context.Context) (response *OrderPlacementRe
 
 	select {
 	case response := <-messageCh:
-		var orderPlacementResponse OrderPlacementResponse
-		err = Unmarshal(response, &orderPlacementResponse)
+		var rsp OrderPlacementResponse
+		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
 		}
-		return &orderPlacementResponse, nil
+		if rsp.Status != SuccessCode {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+		}
+		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
@@ -573,12 +584,15 @@ func (s *OrderStatusService) Do(ctx context.Context, opts ...RequestOption) (res
 
 	select {
 	case response := <-messageCh:
-		var orderPlacementResponse OrderPlacementResponse
-		err = Unmarshal(response, &orderPlacementResponse)
+		var rsp OrderPlacementResponse
+		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
 		}
-		return &orderPlacementResponse, nil
+		if rsp.Status != SuccessCode {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+		}
+		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
@@ -634,12 +648,12 @@ func (s *AccountPositionService) Do(ctx context.Context, opts ...RequestOption) 
 
 	select {
 	case response := <-messageCh:
-		var accountPositionResponse AccountPositionResponse
-		err = Unmarshal(response, &accountPositionResponse)
+		var rsp AccountPositionResponse
+		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
 		}
-		return &accountPositionResponse, nil
+		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
@@ -912,6 +926,9 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 		if err != nil {
 			return nil, err
 		}
+		if rsp.Status != SuccessCode {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+		}
 		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -1015,6 +1032,9 @@ func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementRes
 		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
+		}
+		if rsp.Status != SuccessCode {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
 	case <-ctx.Done():

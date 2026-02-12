@@ -186,3 +186,7 @@ var (
 	FEE_RETURN                  IncomeType = "FEE_RETURN"                  // 策略交易手续费退还
 	BFUSD_REWARD                IncomeType = "BFUSD_REWARD"                // BFUSD每日奖励
 )
+
+const (
+	SuccessCode = 200
+)
