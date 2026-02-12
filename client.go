@@ -574,8 +574,15 @@ func (c *Client) NewGetSymbolConfigService() *SymbolConfigService {
 }
 
 // Binance Get Leverage Bracket (GET /fapi/v1/leverageBracket)
+// 杠杆分层标准
 func (c *Client) NewLeverageBracketService() *LeverageBracketService {
 	return &LeverageBracketService{c: c}
+}
+
+// Binance Get Position Risk (GET /fapi/v2/positionRisk)
+// 用户持仓风险
+func (c *Client) NewGetPositionRiskService() *PositionRisk {
+	return &PositionRisk{c: c}
 }
 
 // ---------------------------Trade API---------------------------------
