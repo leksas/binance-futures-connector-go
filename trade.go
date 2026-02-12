@@ -2278,8 +2278,14 @@ func (s *GetOpenAlgoOrdersService) Do(ctx context.Context, opts ...RequestOption
 		endpoint: "/fapi/v1/openAlgoOrders",
 		secType:  secTypeSigned,
 	}
+	if s.algoType != nil {
+		r.setParam("algoType", *s.algoType)
+	}
 	if s.symbol != nil {
 		r.setParam("symbol", *s.symbol)
+	}
+	if s.algoID != nil {
+		r.setParam("algoId", *s.algoID)
 	}
 	data, err := s.c.callAPI(ctx, r, opts...)
 	if err != nil {
