@@ -706,7 +706,7 @@ type AlgoOrderPlacementService struct {
 	closePosition    *bool
 	priceProtect     *string
 	reduceOnly       *bool
-	activationPrice  *float64
+	activatePrice    *float64
 	callbackRate     *float64
 	clientAlgoID     *string
 	newOrderRespType *OrderRespType
@@ -785,8 +785,8 @@ func (s *AlgoOrderPlacementService) ReduceOnly(reduceOnly bool) *AlgoOrderPlacem
 	return s
 }
 
-func (s *AlgoOrderPlacementService) ActivationPrice(activationPrice float64) *AlgoOrderPlacementService {
-	s.activationPrice = &activationPrice
+func (s *AlgoOrderPlacementService) ActivatePrice(activatePrice float64) *AlgoOrderPlacementService {
+	s.activatePrice = &activatePrice
 	return s
 }
 
@@ -858,8 +858,8 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 	if s.reduceOnly != nil {
 		parameters["reduceOnly"] = BoolToString(*s.reduceOnly)
 	}
-	if s.activationPrice != nil {
-		parameters["activationPrice"] = Float64ToString(*s.activationPrice)
+	if s.activatePrice != nil {
+		parameters["activatePrice"] = Float64ToString(*s.activatePrice)
 	}
 	if s.callbackRate != nil {
 		parameters["callbackRate"] = Float64ToString(*s.callbackRate)
