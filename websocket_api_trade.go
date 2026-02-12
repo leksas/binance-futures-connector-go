@@ -865,7 +865,7 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 		parameters["callbackRate"] = Float64ToString(*s.callbackRate)
 	}
 	if s.clientAlgoID != nil {
-		parameters["clientAlgoID"] = *s.clientAlgoID
+		parameters["clientAlgoId"] = *s.clientAlgoID
 	}
 	if s.newOrderRespType != nil {
 		parameters["newOrderRespType"] = *s.newOrderRespType
