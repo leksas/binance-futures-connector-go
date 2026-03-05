@@ -1,0 +1,43 @@
+package main
+
+import (
+	"fmt"
+	"time"
+
+	binance_futures_connector "github.com/leksas/binance-futures-connector-go"
+)
+
+func main() {
+	WsCombineKlineExample()
+}
+
+func WsCombineKlineExample() {
+	websocketStreamClient := binance_futures_connector.NewWebsocketStreamClient(true)
+	wsKlineHandler := func(event *binance_futures_connector.WsContinuousKlineEvent) {
+		fmt.Println(binance_futures_connector.PrettyPrint(event))
+	}
+	errHandler := func(err error) {
+		fmt.Println(err)
+	}
+
+	symbolIntervalPair := map[string]string{
+		"BTCUSDT": "1m",
+		"ETHUSDT": "1m",
+	}
+	doneCh, stopCh, err := websocketStreamClient.WsCombinedContinuousKlineServe(
+		symbolIntervalPair,
+		binance_futures_connector.PERPETUAL,
+		wsKlineHandler,
+		errHandler,
+	)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// use stopCh to exit
+	go func() {
+		time.Sleep(10 * time.Second)
+		stopCh <- struct{}{}
+	}()
+	<-doneCh
+}

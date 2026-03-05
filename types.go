@@ -90,6 +90,7 @@ var (
 	FINISHED         OrderStatus = "FINISHED"         // 条件单已完成
 
 	// Interval1m K线间隔
+	Interval1s  Interval = "1s"
 	Interval1m  Interval = "1m"
 	Interval3m  Interval = "3m"
 	Interval5m  Interval = "5m"
