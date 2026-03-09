@@ -27,9 +27,12 @@ type WebsocketStreamClient struct {
 	BindIP     string
 }
 
+// NewWebsocketStreamClient creates a new WebsocketStreamClient with the specified parameters.
+// @param isCombined: true 连接到组合流，false 连接到单一流
+// @param baseURL: 可选参数，覆盖默认的生产环境 WebSocket URL
 func NewWebsocketStreamClient(isCombined bool, baseURL ...string) *WebsocketStreamClient {
 	// Set default base URL to production WS URL
-	url := "wss://fstream.binance.com"
+	url := MarketEndPoint
 
 	if len(baseURL) > 0 {
 		url = baseURL[0]

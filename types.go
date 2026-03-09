@@ -20,6 +20,7 @@ type (
 	AutoCloseType  = string
 	IncomeType     = string
 	AlgoType       = string
+	EndPoint       = string
 )
 
 var (
@@ -186,6 +187,10 @@ var (
 	STRATEGY_UMFUTURES_TRANSFER IncomeType = "STRATEGY_UMFUTURES_TRANSFER" // UM策略子账户划转
 	FEE_RETURN                  IncomeType = "FEE_RETURN"                  // 策略交易手续费退还
 	BFUSD_REWARD                IncomeType = "BFUSD_REWARD"                // BFUSD每日奖励
+
+	PublicEndPoint  EndPoint = "wss://fstream.binance.com/public"  // 高频公共行情/盘口
+	MarketEndPoint  EndPoint = "wss://fstream.binance.com/market"  // 常规公共市场数据
+	PrivateEndPoint EndPoint = "wss://fstream.binance.com/private" // 用户私有数据
 )
 
 const (
