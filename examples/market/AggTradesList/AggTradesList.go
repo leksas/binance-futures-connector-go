@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 func AggTradesList() {
 	baseURL := "https://fapi.binance.com"
 
-	client := binance_connector.NewClient("", "", baseURL)
+	client := bf.NewClient("", "", baseURL)
 
 	// AggTradesList
 	aggTradesList, err := client.NewAggTradesListService().
@@ -23,5 +23,5 @@ func AggTradesList() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(binance_connector.PrettyPrint(aggTradesList))
+	fmt.Println(bf.PrettyPrint(aggTradesList))
 }

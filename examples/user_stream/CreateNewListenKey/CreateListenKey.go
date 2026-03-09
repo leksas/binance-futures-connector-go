@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func CreateNewListenKey() {
 	secretKey := "your secret key"
 	baseURL := "https://api.binance.com"
 
-	client := binance_connector.NewClient(apiKey, secretKey, baseURL)
+	client := bf.NewClient(apiKey, secretKey, baseURL)
 	client.UseFastHTTPClient()
 
 	listenKey, err := client.NewCreateListenKeyService().

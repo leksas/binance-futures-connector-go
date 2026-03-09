@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 }
 
 func CancelOrderExample() {
-	client := binance_connector.NewWebsocketAPIClient("api_key", "secret_key", "wss://ws-api.testnet.binance.vision/ws-api/v3")
+	client := bf.NewWebsocketAPIClient("api_key", "secret_key", "wss://ws-api.testnet.binance.vision/ws-api/v3")
 	err := client.Connect()
 	if err != nil {
 		log.Printf("Error: %v", err)
@@ -27,7 +27,7 @@ func CancelOrderExample() {
 		return
 	}
 
-	fmt.Println(binance_connector.PrettyPrint(response))
+	fmt.Println(bf.PrettyPrint(response))
 
 	client.WaitForCloseSignal()
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	binance_futures_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -12,9 +12,9 @@ func main() {
 }
 
 func WsKlineExample() {
-	websocketStreamClient := binance_futures_connector.NewWebsocketStreamClient(false)
-	wsKlineHandler := func(event *binance_futures_connector.WsKlineEvent) {
-		fmt.Println(binance_futures_connector.PrettyPrint(event))
+	websocketStreamClient := bf.NewWebsocketStreamClient(false)
+	wsKlineHandler := func(event *bf.WsKlineEvent) {
+		fmt.Println(bf.PrettyPrint(event))
 	}
 	errHandler := func(err error) {
 		fmt.Println(err)

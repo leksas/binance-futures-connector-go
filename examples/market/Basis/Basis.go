@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -12,12 +12,12 @@ func main() {
 }
 
 func Basis() {
-	client := binance_connector.NewClient("", "")
+	client := bf.NewClient("", "")
 
-	rsp, err := client.NewBasisService().Pair("BTCUSDT").ContractType(binance_connector.PERPETUAL).Period("1h").Limit(100).Do(context.Background())
+	rsp, err := client.NewBasisService().Pair("BTCUSDT").ContractType(bf.PERPETUAL).Period("1h").Limit(100).Do(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(binance_connector.PrettyPrint(rsp))
+	fmt.Println(bf.PrettyPrint(rsp))
 }

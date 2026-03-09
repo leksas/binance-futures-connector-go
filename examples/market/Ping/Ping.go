@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_futures_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 func Ping() {
 	baseURL := "https://fapi.binance.com"
 
-	client := binance_futures_connector.NewClient("", "", baseURL)
+	client := bf.NewClient("", "", baseURL)
 
 	// ExchangeInfo
 	err := client.NewPingService().Do(context.Background())

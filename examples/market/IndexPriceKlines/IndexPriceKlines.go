@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 func IndexPriceKlines() {
 	baseURL := "https://fapi.binance.com"
 
-	client := binance_connector.NewClient("", "", baseURL)
+	client := bf.NewClient("", "", baseURL)
 
 	// Klines
 	klines, err := client.NewIndexPriceKlinesService().
@@ -23,5 +23,5 @@ func IndexPriceKlines() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(binance_connector.PrettyPrint(klines))
+	fmt.Println(bf.PrettyPrint(klines))
 }

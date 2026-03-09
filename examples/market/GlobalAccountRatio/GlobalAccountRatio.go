@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -12,12 +12,12 @@ func main() {
 }
 
 func GlobalAccountRatio() {
-	client := binance_connector.NewClient("", "")
+	client := bf.NewClient("", "")
 
 	rsp, err := client.NewGlobalAccountRatioService().Symbol("BTCUSDT").Period("1h").Do(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(binance_connector.PrettyPrint(rsp))
+	fmt.Println(bf.PrettyPrint(rsp))
 }

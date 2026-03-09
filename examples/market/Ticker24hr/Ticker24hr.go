@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_futures_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 func Ticker24hr() {
 	baseURL := "https://fapi.binance.com"
 
-	client := binance_futures_connector.NewClient("", "", baseURL)
+	client := bf.NewClient("", "", baseURL)
 
 	// Klines
 	klines, err := client.NewTicker24hrService().Symbol("BTCUSDT").Do(context.Background())
@@ -22,5 +22,5 @@ func Ticker24hr() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(binance_futures_connector.PrettyPrint(klines))
+	fmt.Println(bf.PrettyPrint(klines))
 }

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func IfNewUserExample() {
 
 	flag.Parse()
 
-	client, _ := binance_connector.NewEdClient(*apiKey, *privateKey, "https://fapi.binance.com")
+	client, _ := bf.NewEdClient(*apiKey, *privateKey, "https://fapi.binance.com")
 
 	response, err := client.NewIfNewUserService().BrokerID(*code).Do(context.Background())
 	if err != nil {
@@ -30,5 +30,5 @@ func IfNewUserExample() {
 		return
 	}
 
-	fmt.Println(binance_connector.PrettyPrint(response))
+	fmt.Println(bf.PrettyPrint(response))
 }

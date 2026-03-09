@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	binance_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 }
 
 func AccountPositionExample() {
-	client := binance_connector.NewWebsocketAPIClient("api_key", "secret_key", "wss://ws-fapi.binance.com/ws-fapi/v1")
+	client := bf.NewWebsocketAPIClient("api_key", "secret_key", "wss://ws-fapi.binance.com/ws-fapi/v1")
 	err := client.Connect()
 	if err != nil {
 		log.Printf("Error: %v", err)
@@ -28,7 +28,7 @@ func AccountPositionExample() {
 		return
 	}
 
-	fmt.Println(binance_connector.PrettyPrint(response))
+	fmt.Println(bf.PrettyPrint(response))
 
 	client.WaitForCloseSignal()
 }

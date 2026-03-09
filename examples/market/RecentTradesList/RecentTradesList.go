@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	binance_futures_connector "github.com/leksas/binance-futures-connector-go"
+	bf "github.com/leksas/binance-futures-connector-go"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func RecentTrades() {
 	apiKey := "your api key"
 	baseURL := "https://fapi.binance.com"
 
-	client := binance_futures_connector.NewClient(apiKey, "", baseURL)
+	client := bf.NewClient(apiKey, "", baseURL)
 
 	recentTrades, err := client.NewRecentTradesListService().
 		Symbol("BTCUSDT").Do(context.Background())
@@ -23,5 +23,5 @@ func RecentTrades() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(binance_futures_connector.PrettyPrint(recentTrades))
+	fmt.Println(bf.PrettyPrint(recentTrades))
 }
