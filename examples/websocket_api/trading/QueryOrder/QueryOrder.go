@@ -13,7 +13,7 @@ func main() {
 }
 
 func QueryOrderExample() {
-	client := bf.NewWebsocketAPIClient("api_key", "secret_key", "wss://ws-api.testnet.binance.vision/ws-api/v3")
+	client, _ := bf.NewEdWebsocketAPIClient("", "")
 	err := client.Connect()
 	if err != nil {
 		log.Printf("Error: %v", err)

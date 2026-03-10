@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	CancelOrderExample()
+	CancelAlgoOrderExample()
 }
 
-func CancelOrderExample() {
+func CancelAlgoOrderExample() {
 	client, _ := bf.NewEdWebsocketAPIClient("", "")
 	err := client.Connect()
 	if err != nil {
@@ -21,7 +21,7 @@ func CancelOrderExample() {
 	}
 	defer client.Close()
 
-	response, err := client.NewCancelOrderService().Symbol("COLLECTUSDT").OrigClientOrderId("").Do(context.Background())
+	response, err := client.NewCancelAlgoOrderService().ClientAlgoID("").Do(context.Background())
 	if err != nil {
 		log.Printf("Error: %v", err)
 		return
