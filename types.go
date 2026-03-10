@@ -53,6 +53,7 @@ var (
 	FOK TimeInForce = "FOK" // Fill or Kill 无法全部立即成交就撤销
 	GTX TimeInForce = "GTX" // Good Till Crossing 无法成为挂单方就撤销
 	GTD TimeInForce = "GTD" // Good Till Date 在特定时间之前有效，到期自动撤销
+	RPI TimeInForce = "RPI" // Retail Price Improvement 仅与来自APP或者网页端的订单成交，且为Post Only
 
 	// WorkingType 条件价格触发类型
 	MarkPrice     WorkingType = "MARK_PRICE"     // 标记价格

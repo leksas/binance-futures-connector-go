@@ -13,7 +13,7 @@ func main() {
 }
 
 func PlaceNewOrderExample() {
-	client := bf.NewWebsocketAPIClient("api_key", "secret_key", "wss://ws-fapi.binance.com/ws-fapi/v1")
+	client, _ := bf.NewEdWebsocketAPIClient("", "")
 	err := client.Connect()
 	if err != nil {
 		log.Printf("Error: %v", err)
@@ -21,7 +21,13 @@ func PlaceNewOrderExample() {
 	}
 	defer client.Close()
 
-	response, err := client.NewPlaceNewOrderService().Symbol("BTCUSDT").Side("BUY").OrderType("MARKET").Quantity(0.01).
+	response, err := client.NewPlaceNewOrderService().
+		Symbol("LTCUSDT").
+		Side(bf.Buy).
+		OrderType(bf.Limit).
+		Price(50).
+		Quantity(1).
+		TimeInForce(bf.GTC).
 		Do(context.Background())
 	if err != nil {
 		log.Printf("Error: %v", err)
