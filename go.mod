@@ -1,6 +1,6 @@
 module github.com/leksas/binance-futures-connector-go
 
-go 1.24.0
+go 1.26.0
 
 require (
 	github.com/binance/binance-connector-go v0.8.0
