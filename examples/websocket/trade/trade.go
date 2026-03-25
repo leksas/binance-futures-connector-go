@@ -12,7 +12,7 @@ func main() {
 }
 
 func WsTradeExample() {
-	websocketStreamClient := bf.NewWebsocketStreamClient(true)
+	websocketStreamClient := bf.NewWebsocketStreamClient(true, bf.PublicEndPoint)
 	wsTradeHandler := func(event *bf.WsTradeEvent) {
 		fmt.Println(bf.PrettyPrint(event))
 	}
