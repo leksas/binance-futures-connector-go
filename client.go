@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
@@ -201,13 +202,10 @@ func (c *Client) sign(queryString, bodyString string) (string, error) {
 }
 
 func (c *Client) hmacSign(queryString, bodyString string) (string, error) {
-	raw := fmt.Sprintf("%s%s", queryString, bodyString)
 	mac := hmac.New(sha256.New, []byte(c.SecretKey))
-	_, err := mac.Write([]byte(raw))
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%x", (mac.Sum(nil))), nil
+	mac.Write([]byte(queryString))
+	mac.Write([]byte(bodyString))
+	return hex.EncodeToString(mac.Sum(nil)), nil
 }
 
 func (c *Client) ed25519Sign(queryString, bodyString string) string {
