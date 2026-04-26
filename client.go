@@ -68,6 +68,11 @@ func PrettyPrint(i interface{}) string {
 	return string(s)
 }
 
+func JsonFormat(i interface{}) string {
+	s, _ := Marshal(i)
+	return string(s)
+}
+
 func (c *Client) debug(format string, v ...interface{}) {
 	if c.Debug {
 		c.Logger.Printf(format, v...)

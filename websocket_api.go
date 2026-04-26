@@ -26,6 +26,8 @@ import (
 )
 
 type WebsocketAPIClient struct {
+	sync.Mutex
+
 	APIKey            string
 	APISecret         string
 	Ed25519APIKey     string
@@ -33,15 +35,14 @@ type WebsocketAPIClient struct {
 	UseEd25519        bool
 	UseSBE            bool
 	Endpoint          string
+	BindIP            string
 	Conn              *websocket.Conn
 	Dialer            *websocket.Dialer
+	MessageCh         chan []byte
 	ReqResponseMap    sync.Map
-	Mu                sync.Mutex
-	BindIP            string
-
-	stopChan       chan struct{}
-	maxBackoff     time.Duration // 最大退避间隔
-	initialBackoff time.Duration // 初始退避间隔
+	Debug             bool
+	Reconnect         bool
+	Logger            *log.Logger
 }
 
 type WsAPIRateLimit struct {
@@ -82,8 +83,7 @@ func NewWebsocketAPIClient(apiKey string, apiSecret string, baseURL ...string) *
 			HandshakeTimeout:  45 * time.Second,
 			EnableCompression: false,
 		},
-		initialBackoff: 1 * time.Second,  // 初始重试间隔
-		maxBackoff:     30 * time.Second, // 最大重试间隔，避免间隔过大
+		Logger: log.New(os.Stderr, Name, log.LstdFlags),
 	}
 }
 
@@ -96,6 +96,12 @@ func NewEdWebsocketAPIClient(apiKey string, privateKey string, baseURL ...string
 	}
 	client.UseEd25519Keys(apiKey, pk)
 	return client, nil
+}
+
+func (c *WebsocketAPIClient) debug(format string, v ...interface{}) {
+	if c.Debug {
+		c.Logger.Printf(format, v...)
+	}
 }
 
 func (c *WebsocketAPIClient) UseEd25519Keys(apiKey string, privateKey ed25519.PrivateKey) {
@@ -141,91 +147,70 @@ func (c *WebsocketAPIClient) SetBindIP(ip string) {
 }
 
 func (c *WebsocketAPIClient) Connect() error {
-	if c.Dialer == nil {
-		return fmt.Errorf("dialer not initialized")
+	conn, err := c.dial()
+	if err != nil {
+		return err
 	}
 
-	// 初始化关闭信号通道
-	if c.stopChan == nil {
-		c.stopChan = make(chan struct{})
+	c.Lock()
+	c.Conn = conn
+	c.Unlock()
+	fmt.Println("Connected to OKX Websocket API")
+	if c.MessageCh == nil {
+		c.MessageCh = make(chan []byte, 1000)
+	}
+
+	c.startReader()
+	return nil
+}
+
+func (c *WebsocketAPIClient) dial() (*websocket.Conn, error) {
+	if c.Dialer == nil {
+		return nil, fmt.Errorf("dialer not initialized")
 	}
 
 	headers := http.Header{}
 	headers.Add("User-Agent", fmt.Sprintf("%s/%s", Name, Version))
 	conn, _, err := c.Dialer.Dial(c.Endpoint, headers)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	fmt.Println("Connected to Binance Websocket API")
 	conn.SetReadLimit(655350)
-	c.Conn = conn
-
-	c.startReader() // start reader again
-	return nil
+	return conn, nil
 }
 
 func (c *WebsocketAPIClient) startReader() {
 	go func() {
-		for {
-			select {
-			case <-c.stopChan:
-				// 收到关闭信号，退出循环
-				log.Println("Stopping reader...")
-				return
-			default:
-				_, message, err := c.Conn.ReadMessage()
-				if err != nil {
-					log.Printf("Error reading: %v, attempting to reconnect...", err)
-					// 发生错误时关闭当前连接
-					if c.Conn != nil {
-						_ = c.Conn.Close()
-					}
-					// 尝试重新连接
-					c.reconnect()
-					return
-				}
-				// 处理消息
-				c.Handler(message)
+		defer func() {
+			if c.Reconnect {
+				c.ReLogin()
 			}
+		}()
+
+		for {
+			_, message, err := c.Conn.ReadMessage()
+			if err != nil {
+				log.Println("Ws API error reading:", err)
+				c.Handler([]byte("exit"))
+				return
+			}
+			c.Handler(message)
 		}
 	}()
 }
 
-// 重连逻辑，包含指数退避策略
-func (c *WebsocketAPIClient) reconnect() {
-	backoff := c.initialBackoff // 从初始间隔开始
-
-	for {
-		select {
-		case <-c.stopChan:
-			log.Println("Reconnect canceled")
-			return
-		default:
-			log.Printf("Attempting to reconnect (next delay: %v)...", backoff)
-			err := c.Connect()
-			if err == nil {
-				log.Println("Reconnected successfully")
-				return // 重连成功，退出重连循环
-			}
-
-			log.Printf("Reconnection failed: %v, waiting %v before next attempt", err, backoff)
-			time.Sleep(backoff)
-
-			// 退避间隔递增，但不超过最大限制
-			if backoff < c.maxBackoff {
-				backoff *= 2
-				if backoff > c.maxBackoff {
-					backoff = c.maxBackoff
-				}
-			}
-		}
+func (c *WebsocketAPIClient) ReLogin() {
+	err := c.Connect()
+	if err != nil {
+		log.Println("Ws API error reconnecting:", err)
+		return
 	}
+
+	log.Printf("Ws API re-login successful")
 }
 
 // Handler function to handle responses
 // 支持并发执行, 但不支持用户数据流订阅, 用户数据流相应中没有 ID 字段
-// 需要在 HandlerV2 中处理
 func (c *WebsocketAPIClient) Handler(message []byte) {
 	var response WsAPIErrorResponse
 	err := Unmarshal(message, &response)
@@ -238,19 +223,9 @@ func (c *WebsocketAPIClient) Handler(message []byte) {
 		if channel, ok := val.(chan []byte); ok {
 			channel <- message
 		}
+	} else {
+		c.MessageCh <- message
 	}
-}
-
-// Handler function to handle responses
-// 不再支持并发执行请求, 会导致数据错乱, 如 A 请求会收到 B 请求的响应
-// 直接返回, 不做 JSON 解析, 速度更快
-func (c *WebsocketAPIClient) HandlerV2(message []byte) {
-	c.ReqResponseMap.Range(func(key, value interface{}) bool {
-		if channel, ok := value.(chan []byte); ok {
-			channel <- message
-		}
-		return true
-	})
 }
 
 func (c *WebsocketAPIClient) WaitForCloseSignal() {
@@ -260,17 +235,29 @@ func (c *WebsocketAPIClient) WaitForCloseSignal() {
 }
 
 func (c *WebsocketAPIClient) Close() error {
-	if c.stopChan != nil {
-		close(c.stopChan)
-	}
+	c.Reconnect = false
 	return c.Conn.Close()
 }
 
 func (c *WebsocketAPIClient) SendMessage(msg interface{}) error {
-	c.Mu.Lock()
-	defer c.Mu.Unlock()
+	if c.Conn == nil {
+		return fmt.Errorf("websocket connection not available")
+	}
+	c.debug("Send message: %s", JsonFormat(msg))
 
-	return c.Conn.WriteJSON(msg)
+	c.Lock()
+	err := c.Conn.WriteJSON(msg)
+	c.Unlock()
+	if err == nil {
+		return nil
+	}
+
+	c.debug("Send message failed: %v, %s", err, "reconnect...")
+	if c.Reconnect {
+		c.ReLogin()
+	}
+	return err
+
 }
 
 func (c *WebsocketAPIClient) RequestHandler(req interface{}, handler WsHandler, errHandler ErrHandler) (stopCh chan struct{}, err error) {
