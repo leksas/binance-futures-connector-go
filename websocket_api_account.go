@@ -2,6 +2,7 @@ package binance_futures_connector
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 )
 
@@ -24,7 +25,7 @@ func (s *AccountInformationService) Do(ctx context.Context) (*AccountInformation
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Sign error: %w", err)
 	}
 
 	id := getUUID()
@@ -35,7 +36,7 @@ func (s *AccountInformationService) Do(ctx context.Context) (*AccountInformation
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)

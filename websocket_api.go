@@ -155,7 +155,7 @@ func (c *WebsocketAPIClient) Connect() error {
 	c.Lock()
 	c.Conn = conn
 	c.Unlock()
-	fmt.Println("Connected to OKX Websocket API")
+	fmt.Println("Connected to Binance Websocket API")
 	if c.MessageCh == nil {
 		c.MessageCh = make(chan []byte, 1000)
 	}
@@ -546,13 +546,13 @@ func (s *ExchangeInformationService) Do(ctx context.Context) (*ExchangeInformati
 		fmt.Println("Error:", err)
 	}
 
-	doneCh, err := s.websocketAPI.RequestHandler(payload, handler, errHandler)
+	_, err := s.websocketAPI.RequestHandler(payload, handler, errHandler)
 	if err != nil {
 		return nil, err
 	}
 
 	select {
-	case <-doneCh:
+	case <-ctx.Done():
 		return nil, ctx.Err()
 	case response := <-responseCh:
 		return response, nil
