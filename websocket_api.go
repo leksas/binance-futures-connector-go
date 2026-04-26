@@ -104,6 +104,10 @@ func (c *WebsocketAPIClient) debug(format string, v ...interface{}) {
 	}
 }
 
+func (c *WebsocketAPIClient) error(format string, v ...interface{}) {
+	c.Logger.Printf(format, v...)
+}
+
 func (c *WebsocketAPIClient) UseEd25519Keys(apiKey string, privateKey ed25519.PrivateKey) {
 	c.APIKey = apiKey
 	c.Ed25519APIKey = apiKey
@@ -212,6 +216,7 @@ func (c *WebsocketAPIClient) ReLogin() {
 // Handler function to handle responses
 // 支持并发执行, 但不支持用户数据流订阅, 用户数据流相应中没有 ID 字段
 func (c *WebsocketAPIClient) Handler(message []byte) {
+	c.debug("Receive message: %s", string(message))
 	var response WsAPIErrorResponse
 	err := Unmarshal(message, &response)
 	if err != nil {
@@ -252,7 +257,7 @@ func (c *WebsocketAPIClient) SendMessage(msg interface{}) error {
 		return nil
 	}
 
-	c.debug("Send message failed: %v, %s", err, "reconnect...")
+	c.error("Send message failed: %v, %s", err, "reconnect...")
 	if c.Reconnect {
 		c.ReLogin()
 	}
