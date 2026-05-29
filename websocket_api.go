@@ -223,10 +223,23 @@ func (c *WebsocketAPIClient) Handler(message []byte) {
 	// Send the message to the corresponding request
 	if val, exists := c.ReqResponseMap.Load(response.ID); exists {
 		if channel, ok := val.(chan []byte); ok {
-			channel <- message
+			select {
+			case channel <- message:
+			default:
+				c.error("Ws API response channel full, drop response id: %s, message: %s", response.ID, string(message))
+			}
 		}
-	} else {
-		c.MessageCh <- message
+		return
+	}
+
+	if c.MessageCh == nil {
+		return
+	}
+
+	select {
+	case c.MessageCh <- message:
+	default:
+		c.error("Ws API message channel full, drop unsolicited message: %s", string(message))
 	}
 }
 
