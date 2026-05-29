@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+
+	"github.com/leksas/binance-futures-connector-go/handlers"
 )
 
 type AccountInformationService struct {
@@ -48,12 +50,15 @@ func (s *AccountInformationService) Do(ctx context.Context) (*AccountInformation
 
 	select {
 	case response := <-messageCh:
-		var accInfoResponse AccountInformationResponse
-		err = Unmarshal(response, &accInfoResponse)
+		var rsp AccountInformationResponse
+		err = Unmarshal(response, &rsp)
 		if err != nil {
 			return nil, err
 		}
-		return &accInfoResponse, nil
+		if rsp.Status != SuccessCode && rsp.Error != nil {
+			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+		}
+		return &rsp, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}

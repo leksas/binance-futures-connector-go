@@ -193,7 +193,6 @@ func (c *WebsocketAPIClient) startReader() {
 			_, message, err := c.Conn.ReadMessage()
 			if err != nil {
 				log.Println("Ws API error reading:", err)
-				c.Handler([]byte("exit"))
 				return
 			}
 			c.Handler(message)
@@ -239,6 +238,9 @@ func (c *WebsocketAPIClient) WaitForCloseSignal() {
 
 func (c *WebsocketAPIClient) Close() error {
 	c.Reconnect = false
+	if c.Conn == nil {
+		return nil
+	}
 	return c.Conn.Close()
 }
 
@@ -261,43 +263,6 @@ func (c *WebsocketAPIClient) SendMessage(msg interface{}) error {
 	}
 	return err
 
-}
-
-func (c *WebsocketAPIClient) RequestHandler(req interface{}, handler WsHandler, errHandler ErrHandler) (stopCh chan struct{}, err error) {
-	err = c.SendMessage(req)
-	if err != nil {
-		return nil, err
-	}
-	stopCh, err = wsApiServe(c.Conn, handler, errHandler)
-	if err != nil {
-		return nil, err
-	}
-	return stopCh, nil
-}
-
-func wsApiServe(c *websocket.Conn, handler WsHandler, errHandler ErrHandler) (stopCh chan struct{}, err error) {
-	stopCh = make(chan struct{})
-	go func() {
-		if WebsocketAPIKeepalive {
-			keepAlive(c, WebsocketAPITimeout)
-		}
-
-		for {
-			select {
-			case <-stopCh:
-				return
-			default:
-				_, message, err := c.ReadMessage()
-				if err != nil {
-					fmt.Println(err)
-					errHandler(err)
-					continue
-				}
-				handler(message)
-			}
-		}
-	}()
-	return stopCh, nil
 }
 
 func (c *WebsocketAPIClient) Sign(parameters map[string]string) (map[string]string, error) {
@@ -389,7 +354,7 @@ func getUUID() string {
 func randomHex(n int) string {
 	bytes := make([]byte, n/2)
 	if _, err := rand.Read(bytes); err != nil {
-		panic(err)
+		return ""
 	}
 	return hex.EncodeToString(bytes)
 }

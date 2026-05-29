@@ -30,7 +30,7 @@ func (s *StartUserDataStreamService) Do(ctx context.Context) (*StartUserDataStre
 		"params": parameters,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err := s.websocketAPI.SendMessage(payload)
@@ -86,7 +86,7 @@ func (s *PingUserDataStreamService) Do(ctx context.Context) (*PingUserDataStream
 		"params": parameters,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err := s.websocketAPI.SendMessage(payload)
@@ -140,7 +140,7 @@ func (s *StopUserDataStreamService) Do(ctx context.Context) (*StopUserDataStream
 		"params": parameters,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err := s.websocketAPI.SendMessage(payload)

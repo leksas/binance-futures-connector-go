@@ -215,7 +215,7 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -226,7 +226,7 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)
@@ -243,7 +243,7 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Status != SuccessCode {
+		if rsp.Status != SuccessCode && rsp.Error != nil {
 			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
@@ -369,7 +369,7 @@ func (s *OrderModifyService) Do(ctx context.Context) (*OrderPlacementResponse, e
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -397,7 +397,7 @@ func (s *OrderModifyService) Do(ctx context.Context) (*OrderPlacementResponse, e
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Status != SuccessCode {
+		if rsp.Status != SuccessCode && rsp.Error != nil {
 			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
@@ -450,7 +450,7 @@ func (s *OrderCancelService) Do(ctx context.Context) (response *OrderPlacementRe
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -478,7 +478,7 @@ func (s *OrderCancelService) Do(ctx context.Context) (response *OrderPlacementRe
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Status != SuccessCode {
+		if rsp.Status != SuccessCode && rsp.Error != nil {
 			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
@@ -503,7 +503,7 @@ func (s *OrderCancelService) Send() {
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	id := getUUID()
@@ -561,7 +561,7 @@ func (s *OrderStatusService) Do(ctx context.Context, opts ...RequestOption) (res
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -572,7 +572,7 @@ func (s *OrderStatusService) Do(ctx context.Context, opts ...RequestOption) (res
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)
@@ -589,7 +589,7 @@ func (s *OrderStatusService) Do(ctx context.Context, opts ...RequestOption) (res
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Status != SuccessCode {
+		if rsp.Status != SuccessCode && rsp.Error != nil {
 			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
@@ -625,7 +625,7 @@ func (s *AccountPositionService) Do(ctx context.Context, opts ...RequestOption) 
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -636,7 +636,7 @@ func (s *AccountPositionService) Do(ctx context.Context, opts ...RequestOption) 
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)
@@ -898,7 +898,7 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -909,7 +909,7 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)
@@ -926,7 +926,7 @@ func (s *AlgoOrderPlacementService) Do(ctx context.Context) (*AlgoOrderPlacement
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Status != SuccessCode {
+		if rsp.Status != SuccessCode && rsp.Error != nil {
 			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
@@ -1005,7 +1005,7 @@ func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementRes
 
 	signedParams, err := s.websocketAPI.Sign(parameters)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	id := getUUID()
@@ -1016,7 +1016,7 @@ func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementRes
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)
@@ -1033,7 +1033,7 @@ func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementRes
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Status != SuccessCode {
+		if rsp.Status != SuccessCode && rsp.Error != nil {
 			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
