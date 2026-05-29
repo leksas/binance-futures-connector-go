@@ -994,10 +994,10 @@ func (s *AlgoOrderCancelService) RecvWindow(recvWindow int64) *AlgoOrderCancelSe
 func (s *AlgoOrderCancelService) Do(ctx context.Context) (*AlgoOrderPlacementResponse, error) {
 	parameters := make(map[string]string, 0)
 	if s.algoID != nil {
-		parameters["algoid"] = Int64ToString(*s.algoID)
+		parameters["algoId"] = Int64ToString(*s.algoID)
 	}
 	if s.clientAlgoID != nil {
-		parameters["clientalgoid"] = *s.clientAlgoID
+		parameters["clientAlgoId"] = *s.clientAlgoID
 	}
 	if s.recvWindow != nil {
 		parameters["recvWindow"] = Int64ToString(*s.recvWindow)
