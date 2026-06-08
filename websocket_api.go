@@ -41,7 +41,10 @@ type WebsocketAPIClient struct {
 	Debug             bool
 	Reconnect         bool
 	Logger            *log.Logger
+	MsgHandler        MsgHandler
 }
+
+type MsgHandler (func(action, msg string))
 
 type WsAPIRateLimit struct {
 	RateLimitType string `json:"rateLimitType"`
@@ -196,6 +199,9 @@ func (c *WebsocketAPIClient) startReader() {
 				return
 			}
 			c.Handler(message)
+			if c.MsgHandler != nil {
+				c.MsgHandler("recv:", string(message))
+			}
 		}
 	}()
 }
@@ -208,6 +214,11 @@ func (c *WebsocketAPIClient) ReLogin() {
 	}
 
 	log.Printf("Ws API re-login successful")
+}
+
+// RegisterMsgHandler 注册消息回调处理程序
+func (c *WebsocketAPIClient) RegisterMsgHandler(handler MsgHandler) {
+	c.MsgHandler = handler
 }
 
 // Handler function to handle responses
@@ -267,6 +278,9 @@ func (c *WebsocketAPIClient) SendMessage(msg interface{}) error {
 	err := c.Conn.WriteJSON(msg)
 	c.Unlock()
 	if err == nil {
+		if c.MsgHandler != nil {
+			c.MsgHandler("send:", JsonFormat(msg))
+		}
 		return nil
 	}
 
