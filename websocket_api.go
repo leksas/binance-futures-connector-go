@@ -138,6 +138,7 @@ func (c *WebsocketAPIClient) SetBindIP(ip string) {
 		return
 	}
 
+	c.BindIP = ip
 	c.Endpoint = "wss://ws-fapi-mm.binance.com/ws-fapi/v1"
 	c.Dialer.NetDial = func(network, addr string) (net.Conn, error) {
 		lAddr, err := net.ResolveTCPAddr(network, ip+":0")
