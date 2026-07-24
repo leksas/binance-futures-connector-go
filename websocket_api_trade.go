@@ -380,7 +380,7 @@ func (s *OrderModifyService) Do(ctx context.Context) (*OrderPlacementResponse, e
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)
@@ -461,7 +461,7 @@ func (s *OrderCancelService) Do(ctx context.Context) (response *OrderPlacementRe
 		"params": signedParams,
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err2 := s.websocketAPI.SendMessage(payload)

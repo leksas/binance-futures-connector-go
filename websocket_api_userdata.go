@@ -600,7 +600,7 @@ func (s *UnsubscribeUserDataStreamService) Do(ctx context.Context) (*Unsubscribe
 		"method": "userDataStream.unsubscribe",
 	}
 
-	messageCh := make(chan []byte)
+	messageCh := make(chan []byte, 1)
 	s.websocketAPI.ReqResponseMap.Store(id, messageCh)
 
 	err := s.websocketAPI.SendMessage(payload)
