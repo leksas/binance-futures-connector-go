@@ -963,6 +963,8 @@ type AlgoOrderPlacementResult struct {
 	ClosePosition   bool         `json:"closePosition"`
 	PriceProtect    bool         `json:"priceProtect"`
 	ReduceOnly      bool         `json:"reduceOnly"`
+	ActivatePrice   string       `json:"activatePrice"`
+	CallbackRate    string       `json:"callbackRate"`
 	CreateTime      int64        `json:"createTime"`
 	UpdateTime      int64        `json:"updateTime"`
 	TriggerTime     int64        `json:"triggerTime"`
