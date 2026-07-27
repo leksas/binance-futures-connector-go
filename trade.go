@@ -2440,3 +2440,49 @@ type NewAllAlgoOrdersResponse struct {
 	TriggerTime     int64        `json:"triggerTime"`
 	GoodTillDate    int64        `json:"goodTillDate"`
 }
+
+// Binance Get API Trading Status endpoint (GET /fapi/v1/apiTradingStatus)
+// https://developers.binance.com/legacy-docs/zh-CN/derivatives/usds-margined-futures/account/rest-api/Futures-Trading-Quantitative-Rules-Indicators#http%E8%AF%B7%E6%B1%82
+type GetAPITradingStatusService struct {
+	c      *Client
+	symbol *string
+}
+
+func (s *GetAPITradingStatusService) Symbol(symbol string) *GetAPITradingStatusService {
+	s.symbol = &symbol
+	return s
+}
+
+func (s *GetAPITradingStatusService) Do(ctx context.Context, opts ...RequestOption) (res *APITradingStatus, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/apiTradingStatus",
+		secType:  secTypeSigned,
+	}
+	if s.symbol != nil {
+		r.setParam("symbol", *s.symbol)
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(APITradingStatus)
+	err = Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type APITradingStatus struct {
+	Indicators map[string][]Indicator `json:"indicators"`
+	UpdateTime int64                  `json:"updateTime"`
+}
+
+type Indicator struct {
+	Indicator          string `json:"indicator"`
+	Value              int    `json:"value"`
+	TriggerValue       int    `json:"triggerValue"`
+	PlannedRecoverTime int64  `json:"plannedRecoverTime"`
+	IsLocked           bool   `json:"isLocked"`
+}

@@ -674,6 +674,11 @@ func (c *Client) NewSetMultiAssetMarginService() *SetMultiAssetMarginService {
 	return &SetMultiAssetMarginService{c: c}
 }
 
+// Binance Get API Trading Status (GET /fapi/v1/apiTradingStatus)
+func (c *Client) NewGetAPITradingStatusService() *GetAPITradingStatusService {
+	return &GetAPITradingStatusService{c: c}
+}
+
 // ---------------------------ALGO Trade API---------------------------
 // Binance Create Algo Order (POST /fapi/v1/algoOrder)
 // 下条件单
