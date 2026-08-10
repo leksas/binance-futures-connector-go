@@ -2480,9 +2480,9 @@ type APITradingStatus struct {
 }
 
 type Indicator struct {
-	Indicator          string `json:"indicator"`
-	Value              int    `json:"value"`
-	TriggerValue       int    `json:"triggerValue"`
-	PlannedRecoverTime int64  `json:"plannedRecoverTime"`
-	IsLocked           bool   `json:"isLocked"`
+	Indicator          string  `json:"indicator"`
+	Value              float64 `json:"value"`
+	TriggerValue       float64 `json:"triggerValue"`
+	PlannedRecoverTime int64   `json:"plannedRecoverTime"`
+	IsLocked           bool    `json:"isLocked"`
 }
