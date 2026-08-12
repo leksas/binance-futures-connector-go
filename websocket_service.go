@@ -745,6 +745,72 @@ func (c *WebsocketStreamClient) WsCombinedTickerArrServe(handler WsTickerArrHand
 	return wsServe(cfg, wsHandler, errHandler)
 }
 
+type WsForceOrderEvent struct {
+	Event      string       `json:"e"`
+	EventTime  int64        `json:"E"`
+	Order      WsForceOrder `json:"o"`
+	Symbol     string       `json:"ps"` // (迁移后新增) 标的交易对
+	SymbolType int          `json:"st"` // (迁移后新增) Symbol 类型:1 = UM,2 = CM
+}
+
+type WsForceOrder struct {
+	Symbol      string      `json:"s"`
+	Side        Side        `json:"S"`
+	OrderType   OrderType   `json:"o"`
+	TimeInForce TimeInForce `json:"f"`
+	Quantity    string      `json:"q"`
+	Price       string      `json:"p"`
+	AvgPrice    string      `json:"ap"`
+	Status      OrderStatus `json:"X"`
+	LastQty     string      `json:"l"`
+	FilledQty   string      `json:"z"`
+	TradeTime   int64       `json:"T"`
+}
+
+type WsCombinedForceOrderEvent struct {
+	Data   *WsForceOrderEvent `json:"data"`
+	Stream string             `json:"stream"`
+}
+
+// WsForceOrderHandler handle websocket force order event
+type WsForceOrderHandler func(event *WsForceOrderEvent)
+
+func (c *WebsocketStreamClient) WsCombinedForceOrderServe(symbols []string, handler WsForceOrderHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := c.Endpoint
+	for s := range symbols {
+		endpoint += fmt.Sprintf("%s@forceOrder", strings.ToLower(symbols[s])) + "/"
+	}
+	endpoint = endpoint[:len(endpoint)-1]
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		event := new(WsCombinedForceOrderEvent)
+		err = Unmarshal(message, event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
+
+		handler(event.Data)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
+
+func (c *WebsocketStreamClient) WsCombinedForceOrderArrServe(handler WsForceOrderHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := fmt.Sprintf("%s/forceOrder@arr", c.Endpoint)
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		event := new(WsCombinedForceOrderEvent)
+		err = Unmarshal(message, event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
+
+		handler(event.Data)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
+
 // WsUserDataHandler handle WsUserDataEvent
 type WsUserDataHandler func(event *WsUserDataEvent)
 
