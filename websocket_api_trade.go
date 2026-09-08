@@ -244,7 +244,7 @@ func (s *OrderPlacementService) Do(ctx context.Context) (*OrderPlacementResponse
 			return nil, err
 		}
 		if rsp.Status != SuccessCode && rsp.Error != nil {
-			return nil, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
+			return &rsp, handlers.NewAPIError(rsp.Error.Code, rsp.Error.Message)
 		}
 		return &rsp, nil
 	case <-ctx.Done():
